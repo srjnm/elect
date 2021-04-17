@@ -46,7 +46,7 @@ func main() {
 	//Declaring all layers
 	postgresDatabase, mux := database.NewPostgresDatabase()
 	userService := services.NewUserService(postgresDatabase)
-	jwtService := services.NewJWTService("elect.com", postgresDatabase)
+	jwtService := services.NewJWTService("e1ect.herokuapp.com", postgresDatabase)
 	userController := controllers.NewUserController(userService, jwtService)
 	authAPI := apis.NewAuthAPI(userController)
 
