@@ -9,7 +9,7 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:8080",
+    "host": "e1ect.herokuapp.com",
     "basePath": "/",
     "paths": {
         "/login": {
