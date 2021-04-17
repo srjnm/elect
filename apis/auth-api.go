@@ -1,0 +1,197 @@
+package apis
+
+import (
+	"elect/controllers"
+	"elect/dto"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
+type AuthAPI struct {
+	userController controllers.UserController
+}
+
+func NewAuthAPI(userController controllers.UserController) *AuthAPI {
+	return &AuthAPI{
+		userController: userController,
+	}
+}
+
+// Login godoc
+// @Summary User Login
+// @Tags auth
+// @Consume json
+// @Produce json
+// @Param login body dto.Login true "User Login"
+// @Success 200 {object} dto.Response
+// @Failure 401 {object} dto.Response
+// @Failure 400 {object} dto.Response
+// @Router /login [post]
+func (auth *AuthAPI) LoginHandler(cxt *gin.Context) {
+	err := auth.userController.Login(cxt)
+
+	if err != nil {
+		cxt.JSON(http.StatusBadRequest, dto.Response{
+			Message: err.Error(),
+		})
+	}
+
+	cxt.JSON(http.StatusOK, dto.Response{
+		Message: "OTP Sent",
+	})
+}
+
+// Logout godoc
+// @Summary User Logout
+// @Tags auth
+// @Description A user has to be logged in currently to access this endpoint.
+// @Produce json
+// @Success 200 {object} dto.Response
+// @Failure 401 {object} dto.Response
+// @Failure 400 {object} dto.Response
+// @Router /logout [post]
+func (auth *AuthAPI) LogoutHandler(cxt *gin.Context) {
+	http.SetCookie(
+		cxt.Writer,
+		&http.Cookie{
+			Name:     "token",
+			Value:    "",
+			MaxAge:   -1,
+			Path:     "/",
+			Domain:   "",
+			Secure:   false,
+			HttpOnly: true,
+			SameSite: http.SameSiteDefaultMode,
+		},
+	)
+
+	cxt.JSON(http.StatusOK, dto.Response{
+		Message: "Logged out successfully",
+	})
+}
+
+// Refresh godoc
+// @Summary Refresh Token
+// @Tags auth
+// @Description A user needs a valid refresh token to access this endpoint.
+// @Produce json
+// @Success 200 {object} dto.Response
+// @Failure 401 {object} dto.Response
+// @Failure 400 {object} dto.Response
+// @Router /refresh [post]
+func (auth *AuthAPI) RefreshHandler(cxt *gin.Context) {
+	err := auth.userController.Refresh(cxt)
+
+	if err != nil {
+		cxt.JSON(http.StatusBadRequest, dto.Response{
+			Message: err.Error(),
+		})
+	} else {
+		cxt.JSON(http.StatusOK, dto.Response{
+			Message: "Token Refreshed",
+		})
+	}
+}
+
+// Verify godoc
+// @Summary Verify Email and Set Password
+// @Tags auth
+// @Produce json
+// @Param password body dto.Verify true "Verify"
+// @Success 200 {object} dto.Response
+// @Failure 401 {object} dto.Response
+// @Failure 400 {object} dto.Response
+// @Router /setpassword [post]
+func (auth *AuthAPI) VerifyHandler(cxt *gin.Context) {
+	err := auth.userController.Verify(cxt)
+
+	if err != nil {
+		cxt.JSON(http.StatusBadRequest, dto.Response{
+			Message: err.Error(),
+		})
+	} else {
+		cxt.JSON(http.StatusOK, dto.Response{
+			Message: "Account Verified",
+		})
+	}
+}
+
+// SetPassword godoc
+// @Summary Set Password
+// @Tags auth
+// @Produce json
+// @Produce text/html
+// @Success 200
+// @Failure 401 {object} dto.Response
+// @Failure 400 {object} dto.Response
+// @Router /verify/{token} [get]
+func (auth *AuthAPI) VerifyGETHandler(cxt *gin.Context) {
+	err := auth.userController.CheckToken(cxt)
+
+	if err != nil {
+		cxt.JSON(http.StatusBadRequest, dto.Response{
+			Message: err.Error(),
+		})
+	}
+
+	cxt.HTML(http.StatusOK, "index.html", gin.H{"token": cxt.Param("token")})
+}
+
+// EnterOTP godoc
+// @Summary Enter OTP
+// @Tags auth
+// @Produce json
+// @Produce text/html
+// @Success 200
+// @Failure 401 {object} dto.Response
+// @Failure 400 {object} dto.Response
+// @Router /otp [get]
+func (auth *AuthAPI) OTPGETHandler(cxt *gin.Context) {
+	email, err := auth.userController.GetOTP(cxt)
+
+	if err != nil {
+		cxt.JSON(http.StatusBadRequest, dto.Response{
+			Message: err.Error(),
+		})
+		return
+	}
+
+	cxt.HTML(http.StatusOK, "otp.html", gin.H{"email": email})
+}
+
+// EnterOTP godoc
+// @Summary Enter OTP
+// @Tags auth
+// @Produce json
+// @Param otp body dto.OTP true "Verify OTP"
+// @Success 200 {object} dto.Response
+// @Failure 401 {object} dto.Response
+// @Failure 400 {object} dto.Response
+// @Router /otp [post]
+func (auth *AuthAPI) OTPHandler(cxt *gin.Context) {
+	err := auth.userController.OTPVerication(cxt)
+
+	if err != nil {
+		cxt.JSON(http.StatusBadRequest, dto.Response{
+			Message: err.Error(),
+		})
+	} else {
+		http.SetCookie(
+			cxt.Writer,
+			&http.Cookie{
+				Name:     "otp",
+				Value:    "",
+				MaxAge:   -1,
+				Path:     "/",
+				Domain:   "",
+				Secure:   false,
+				HttpOnly: true,
+				SameSite: http.SameSiteDefaultMode,
+			},
+		)
+		cxt.JSON(http.StatusOK, dto.Response{
+			Message: "Login Sucessful!",
+		})
+	}
+}

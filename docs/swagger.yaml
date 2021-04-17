@@ -1,0 +1,207 @@
+basePath: /
+definitions:
+  dto.Login:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  dto.OTP:
+    properties:
+      email:
+        type: string
+      otp:
+        type: string
+    required:
+    - email
+    - otp
+    type: object
+  dto.Response:
+    properties:
+      message:
+        type: string
+    type: object
+  dto.Verify:
+    properties:
+      password:
+        type: string
+      token:
+        type: string
+    required:
+    - password
+    - token
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: surajnm15@gmail.com
+    name: ELECT API Support
+  description: This is the backend server of ELECT web application.
+  title: ELECT REST API
+  version: "1.0"
+paths:
+  /login:
+    post:
+      parameters:
+      - description: User Login
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: User Login
+      tags:
+      - auth
+  /logout:
+    post:
+      description: A user has to be logged in currently to access this endpoint.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: User Logout
+      tags:
+      - auth
+  /otp:
+    get:
+      produces:
+      - application/json
+      - text/html
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Enter OTP
+      tags:
+      - auth
+    post:
+      parameters:
+      - description: Verify OTP
+        in: body
+        name: otp
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OTP'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Enter OTP
+      tags:
+      - auth
+  /refresh:
+    post:
+      description: A user needs a valid refresh token to access this endpoint.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Refresh Token
+      tags:
+      - auth
+  /setpassword:
+    post:
+      parameters:
+      - description: Verify
+        in: body
+        name: password
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Verify'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Verify Email and Set Password
+      tags:
+      - auth
+  /verify/{token}:
+    get:
+      produces:
+      - application/json
+      - text/html
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Set Password
+      tags:
+      - auth
+swagger: "2.0"
