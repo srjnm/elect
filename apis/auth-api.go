@@ -35,11 +35,13 @@ func (auth *AuthAPI) LoginHandler(cxt *gin.Context) {
 		cxt.JSON(http.StatusBadRequest, dto.Response{
 			Message: err.Error(),
 		})
+		return
 	}
 
 	cxt.JSON(http.StatusOK, dto.Response{
 		Message: "OTP Sent",
 	})
+	return
 }
 
 // Logout godoc
@@ -69,6 +71,7 @@ func (auth *AuthAPI) LogoutHandler(cxt *gin.Context) {
 	cxt.JSON(http.StatusOK, dto.Response{
 		Message: "Logged out successfully",
 	})
+	return
 }
 
 // Refresh godoc
@@ -87,10 +90,12 @@ func (auth *AuthAPI) RefreshHandler(cxt *gin.Context) {
 		cxt.JSON(http.StatusBadRequest, dto.Response{
 			Message: err.Error(),
 		})
+		return
 	} else {
 		cxt.JSON(http.StatusOK, dto.Response{
 			Message: "Token Refreshed",
 		})
+		return
 	}
 }
 
@@ -110,10 +115,12 @@ func (auth *AuthAPI) VerifyHandler(cxt *gin.Context) {
 		cxt.JSON(http.StatusBadRequest, dto.Response{
 			Message: err.Error(),
 		})
+		return
 	} else {
 		cxt.JSON(http.StatusOK, dto.Response{
 			Message: "Account Verified",
 		})
+		return
 	}
 }
 
@@ -133,6 +140,7 @@ func (auth *AuthAPI) VerifyGETHandler(cxt *gin.Context) {
 		cxt.JSON(http.StatusBadRequest, dto.Response{
 			Message: err.Error(),
 		})
+		return
 	}
 
 	cxt.HTML(http.StatusOK, "index.html", gin.H{"token": cxt.Param("token")})
@@ -176,6 +184,7 @@ func (auth *AuthAPI) OTPHandler(cxt *gin.Context) {
 		cxt.JSON(http.StatusBadRequest, dto.Response{
 			Message: err.Error(),
 		})
+		return
 	} else {
 		http.SetCookie(
 			cxt.Writer,
@@ -193,5 +202,6 @@ func (auth *AuthAPI) OTPHandler(cxt *gin.Context) {
 		cxt.JSON(http.StatusOK, dto.Response{
 			Message: "Login Sucessful!",
 		})
+		return
 	}
 }

@@ -65,9 +65,12 @@
               },
             )
             .then((res)=>{
-              console.log(res);
+              window.alert(res.data["message"])
             })
-            .catch((err) => {throw err});
+            .catch((err) => {
+              window.alert(err.response.data["message"])
+              throw err
+            });
         });
     });
   </script>
