@@ -155,6 +155,9 @@ func (db *postgresDatabase) TokenValidity(token string) error {
 	if res.RowsAffected == 0 {
 		return errors.New("Invalid!")
 	}
+	if user.Verified {
+		return errors.New("Already verified!")
+	}
 
 	return nil
 }
