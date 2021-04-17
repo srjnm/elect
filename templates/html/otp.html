@@ -58,7 +58,7 @@
           //creates a multipart/form-data object
           let data = new FormData(form);
           return axios.post(
-            'http://localhost:8080/otp',
+            'https://e1ect.herokuapp.com/otp',
             {
               "email": "{{ .email }}",
               "otp": data.get("otp")

@@ -58,7 +58,7 @@
             //creates a multipart/form-data object
             let data = new FormData(form);
             return axios.post(
-              '/setpassword',
+              'https://e1ect.herokuapp.com/setpassword',
               {
                 "token": "{{ .token }}",
                 "password": data.get("password")
