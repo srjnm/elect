@@ -95,6 +95,10 @@ func (auth *AuthAPI) LogoutHandler(cxt *gin.Context) {
 func (auth *AuthAPI) RefreshHandler(cxt *gin.Context) {
 	err := auth.userController.Refresh(cxt)
 
+	if err.Error() == "Logged in other device!" {
+		return
+	}
+
 	if err != nil {
 		cxt.JSON(http.StatusBadRequest, dto.Response{
 			Message: err.Error(),
