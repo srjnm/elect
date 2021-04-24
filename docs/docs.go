@@ -204,7 +204,6 @@ var doc = `{
         "/otp": {
             "get": {
                 "produces": [
-                    "application/json",
                     "text/html"
                 ],
                 "tags": [
@@ -347,7 +346,6 @@ var doc = `{
         "/verify/{token}": {
             "get": {
                 "produces": [
-                    "application/json",
                     "text/html"
                 ],
                 "tags": [

@@ -54,6 +54,15 @@ func (auth *AuthAPI) LoginHandler(cxt *gin.Context) {
 // @Failure 400 {object} dto.Response
 // @Router /logout [post]
 func (auth *AuthAPI) LogoutHandler(cxt *gin.Context) {
+	err := auth.userController.Logout(cxt)
+
+	if err != nil {
+		cxt.JSON(http.StatusBadRequest, dto.Response{
+			Message: err.Error(),
+		})
+		return
+	}
+
 	http.SetCookie(
 		cxt.Writer,
 		&http.Cookie{
@@ -127,7 +136,6 @@ func (auth *AuthAPI) VerifyHandler(cxt *gin.Context) {
 // SetPassword godoc
 // @Summary Set Password
 // @Tags auth
-// @Produce json
 // @Produce text/html
 // @Success 200
 // @Failure 401 {object} dto.Response
@@ -149,7 +157,6 @@ func (auth *AuthAPI) VerifyGETHandler(cxt *gin.Context) {
 // EnterOTP godoc
 // @Summary Enter OTP
 // @Tags auth
-// @Produce json
 // @Produce text/html
 // @Success 200
 // @Failure 401 {object} dto.Response

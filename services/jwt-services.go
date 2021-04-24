@@ -20,6 +20,7 @@ type JWTService interface {
 	ValidateRefreshToken(tokenString string) (*jwt.Token, error)
 	GetUserIDAndRole(tokenString string) (string, int, error)
 	GetRole(tokenString string) (int, error)
+	GetEmail(tokenString string) (string, error)
 	GenerateOTPToken(email string) string
 	ValidateOTPToken(tokenString string) (*jwt.Token, error)
 	GetEmailFromOTPToken(tokenString string) (string, error)
@@ -138,9 +139,10 @@ func (service *jwtService) ValidateRefreshToken(tokenString string) (*jwt.Token,
 func (service *jwtService) GetUserIDAndRole(tokenString string) (string, int, error) {
 	token, err := service.ValidateAccessToken(tokenString)
 
-	if err != nil {
+	if err != nil && err.Error() != "Token is expired" {
 		return "", -1, err
 	}
+	err = nil
 
 	if claims := token.Claims.(jwt.MapClaims); token.Valid {
 		//Sprintf to convert interface{} to string
@@ -164,6 +166,7 @@ func (service *jwtService) GetRole(tokenString string) (int, error) {
 	if err != nil && err.Error() != "Token is expired" {
 		return -1, errors.New("Failed to extract JWT claims.")
 	}
+	err = nil
 
 	claims := token.Claims.(jwt.MapClaims)
 
@@ -174,6 +177,25 @@ func (service *jwtService) GetRole(tokenString string) (int, error) {
 	}
 
 	return role, nil
+}
+
+func (service *jwtService) GetEmail(tokenString string) (string, error) {
+	token, err := service.ValidateAccessToken(tokenString)
+
+	if err != nil && err.Error() != "Token is expired" {
+		return "", errors.New("Failed to extract JWT claims.")
+	}
+	err = nil
+
+	claims := token.Claims.(jwt.MapClaims)
+
+	////Sprintf to convert interface{} to string and then convert it to int
+	email := fmt.Sprintf("%v", claims["email"])
+	if err != nil {
+		return "", err
+	}
+
+	return email, nil
 }
 
 func (service *jwtService) GenerateOTPToken(email string) string {

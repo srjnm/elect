@@ -189,7 +189,6 @@
         "/otp": {
             "get": {
                 "produces": [
-                    "application/json",
                     "text/html"
                 ],
                 "tags": [
@@ -332,7 +331,6 @@
         "/verify/{token}": {
             "get": {
                 "produces": [
-                    "application/json",
                     "text/html"
                 ],
                 "tags": [

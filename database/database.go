@@ -25,6 +25,9 @@ type Database interface {
 	GetUserRole(email string) (int, error)
 	VerifyAndSetPassword(setPasswordDTO dto.SetPasswordDTO) error
 	TokenValidity(token string) error
+	StoreActiveRefreshToken(token string, email string) error
+	GetActiveRefreshToken(email string) (string, error)
+	ClearActiveRefreshToken(email string) error
 
 	// Users
 	RegisterStudent(user models.User) error

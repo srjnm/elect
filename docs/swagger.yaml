@@ -171,7 +171,6 @@ paths:
   /otp:
     get:
       produces:
-      - application/json
       - text/html
       responses:
         "200":
@@ -264,7 +263,6 @@ paths:
   /verify/{token}:
     get:
       produces:
-      - application/json
       - text/html
       responses:
         "200":

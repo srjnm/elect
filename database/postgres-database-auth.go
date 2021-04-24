@@ -104,6 +104,37 @@ func (db *postgresDatabase) TokenValidity(token string) error {
 	return nil
 }
 
+func (db *postgresDatabase) StoreActiveRefreshToken(token string, email string) error {
+	var user models.User
+	res := db.connection.Model(&user).Where("email = ?", email).Update("active_refresh_token", token)
+	if res.Error != nil {
+		return res.Error
+	}
+
+	return nil
+}
+
+func (db *postgresDatabase) GetActiveRefreshToken(email string) (string, error) {
+	var user models.User
+	res := db.connection.Model(&models.User{}).Where("email = ?", email).Find(&user)
+	if res.Error != nil {
+		return "", res.Error
+	}
+
+	return user.ActiveRefreshToken, nil
+}
+
+func (db *postgresDatabase) ClearActiveRefreshToken(email string) error {
+	var user models.User
+
+	res := db.connection.Model(&user).Where("email = ?", email).Update("active_refresh_token", "")
+	if res.Error != nil {
+		return res.Error
+	}
+
+	return nil
+}
+
 //Bcrypt Functions
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)

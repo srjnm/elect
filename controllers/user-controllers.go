@@ -23,6 +23,7 @@ type UserController interface {
 	CheckToken(*gin.Context) error
 	OTPVerication(*gin.Context) error
 	GetOTP(*gin.Context) (string, error)
+	Logout(cxt *gin.Context) error
 	RegisterStudents(*gin.Context) (int, error)
 	RegisteredStudents(cxt *gin.Context) ([]dto.GeneralStudentDTO, error)
 }
@@ -110,7 +111,50 @@ func (controller *userController) Refresh(cxt *gin.Context) error {
 		return err
 	}
 
+	email, err := controller.jwtService.GetEmail(value["access_token"])
+	if err != nil {
+		return err
+	}
+
 	if !refreshToken.Valid {
+		http.SetCookie(
+			cxt.Writer,
+			&http.Cookie{
+				Name:     "token",
+				Value:    "",
+				MaxAge:   -1,
+				Path:     "/",
+				Domain:   "",
+				Secure:   false,
+				HttpOnly: true,
+				SameSite: http.SameSiteDefaultMode,
+			},
+		)
+
+		cxt.AbortWithStatusJSON(http.StatusNetworkAuthenticationRequired, dto.Response{
+			Message: "Not logged in!",
+		})
+		return err
+	}
+
+	err = controller.userService.CheckIfActiveRefreshToken(value["refresh_token"], email)
+	if err != nil {
+		http.SetCookie(
+			cxt.Writer,
+			&http.Cookie{
+				Name:     "token",
+				Value:    "",
+				MaxAge:   -1,
+				Path:     "/",
+				Domain:   "",
+				Secure:   false,
+				HttpOnly: true,
+				SameSite: http.SameSiteDefaultMode,
+			},
+		)
+		cxt.AbortWithStatusJSON(http.StatusNetworkAuthenticationRequired, dto.Response{
+			Message: "Not logged in!",
+		})
 		return err
 	}
 
@@ -143,6 +187,11 @@ func (controller *userController) Refresh(cxt *gin.Context) error {
 		)
 	}
 
+	if err != nil {
+		return err
+	}
+
+	err = controller.userService.SetActiveRefreshToken(newRefreshToken, email)
 	if err != nil {
 		return err
 	}
@@ -219,6 +268,11 @@ func (controller *userController) OTPVerication(cxt *gin.Context) error {
 		)
 	}
 
+	err = controller.userService.SetActiveRefreshToken(value["refresh_token"], dbUser.Email)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -242,6 +296,28 @@ func (controller *userController) GetOTP(cxt *gin.Context) (string, error) {
 	}
 
 	return email, nil
+}
+
+func (controller *userController) Logout(cxt *gin.Context) error {
+	var s = securecookie.New([]byte(os.Getenv("COOKIE_HASH_SECRET")), nil)
+
+	cookie, err := cxt.Cookie("token")
+	if err != nil {
+		return err
+	}
+
+	value := make(map[string]string)
+	err = s.Decode("tokens", cookie, &value)
+	if err != nil {
+		return err
+	}
+
+	email, err := controller.jwtService.GetEmail(value["access_token"])
+	if err != nil {
+		return err
+	}
+
+	return controller.userService.ClearActiveRefreshToken(email)
 }
 
 func (controller *userController) RegisterStudents(cxt *gin.Context) (int, error) {
