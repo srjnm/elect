@@ -1,15 +1,19 @@
-p, *, /docs, GET
-p, *, /swagger/*, GET
-p, -1, /verify/*, GET
-p, -1, /setpassword, POST
-p, -1, /login, POST
-p, -2, /otp, POST
-p, -2, /otp, GET
-p, -2, /login, POST
-p, 2, /login, POST
-p, 2, /verify/*, GET
-p, 2, /setpassword, POST
-p, 2, /otp, POST
-p, 2, /otp, GET
-p, 0, /logout, POST
-p, 1, /logout, POST
+p, 2, *, *, allow
+p, *, /docs, GET, allow
+p, *, /swagger/*, GET, allow
+p, -1, /verify/*, GET, allow
+p, -1, /setpassword, POST, allow
+p, -1, /login, POST, allow
+p, -2, /otp, POST, allow
+p, -2, /otp, GET, allow
+p, -2, /login, POST, allow
+p, 2, /login, POST, deny
+p, 2, /verify/*, GET, deny
+p, 2, /setpassword, POST, deny
+p, 2, /otp, POST, deny
+p, 2, /otp, GET, deny
+p, 0, /logout, POST, allow
+p, 1, /logout, POST, allow
+p, 1, /api/registerstudents, POST, allow
+p, 1, /api/registeredstudents*, GET, allow
+p, 2, /api/registeredstudents*, GET, allow

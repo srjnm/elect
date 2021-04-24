@@ -21,6 +21,7 @@ type User struct {
 	Password           string    `gorm:"type: varchar(64); default:null"`
 	Role               int       `gorm:"not null;"`
 	VerifyToken        string    `gorm:"type: varchar(64); default:null"`
+	RegisteredBy       string    `gorm:"default:null"`
 	Verified           bool      `gorm:"default:false"`
 	ActiveRefreshToken string    `gorm:"default:null"`
 	Base

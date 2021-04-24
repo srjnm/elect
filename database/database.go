@@ -19,21 +19,28 @@ import (
 )
 
 type Database interface {
+	// Auth
 	FindUserForAuth(email string) (dto.AuthUserDTO, error)
 	FindUserByID(userID string) (dto.GeneralUserDTO, error)
 	GetUserRole(email string) (int, error)
 	VerifyAndSetPassword(setPasswordDTO dto.SetPasswordDTO) error
 	TokenValidity(token string) error
+
+	// Users
+	RegisterStudent(user models.User) error
+	RegisteredStudents(userId string, paginatorParams dto.PaginatorParams) ([]models.User, error)
+	DeleteRegisteredStudent(userId string, studentUserId string) error
 }
 
 func SetUpQORAdmin(db *gorm.DB) *http.ServeMux {
-	adm := admin.New(&admin.AdminConfig{SiteName: "Blobber", DB: db})
+	adm := admin.New(&admin.AdminConfig{SiteName: "ELECT", DB: db})
 	mux := http.NewServeMux()
 	adm.MountTo("/admin", mux)
 
 	usr := adm.AddResource(models.User{}, &admin.Config{Menu: []string{"User Management"}})
-	usr.IndexAttrs("-Password", "-VerifyToken")
-	usr.EditAttrs("-VerifyToken", "-Email")
+	usr.IndexAttrs("-Password", "-VerifyToken", "-ActiveRefreshToken")
+	usr.NewAttrs("-Password", "-ActiveRefreshToken", "-RegisteredBy")
+	usr.EditAttrs("-VerifyToken", "-Email", "-ActiveRefreshToken", "-RegisteredBy")
 	usr.Meta(&admin.Meta{
 		Name: "Password",
 		Type: "password",

@@ -59,5 +59,7 @@ func Authorization(jwtService services.JWTService) gin.HandlerFunc {
 			})
 			return
 		}
+
+		return
 	}
 }

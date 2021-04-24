@@ -7,7 +7,9 @@ import (
 	"errors"
 	"net/http"
 	"os"
+	"strings"
 
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/securecookie"
 	"github.com/hgfischer/go-otp"
@@ -21,6 +23,8 @@ type UserController interface {
 	CheckToken(*gin.Context) error
 	OTPVerication(*gin.Context) error
 	GetOTP(*gin.Context) (string, error)
+	RegisterStudents(*gin.Context) (int, error)
+	RegisteredStudents(cxt *gin.Context) ([]dto.GeneralStudentDTO, error)
 }
 
 type userController struct {
@@ -238,6 +242,108 @@ func (controller *userController) GetOTP(cxt *gin.Context) (string, error) {
 	}
 
 	return email, nil
+}
+
+func (controller *userController) RegisterStudents(cxt *gin.Context) (int, error) {
+	successCount := 0
+
+	file, _, err := cxt.Request.FormFile("register")
+	if err != nil {
+		return 0, err
+	}
+
+	excFile, err := excelize.OpenReader(file)
+	if err != nil {
+		return 0, err
+	}
+
+	cols, err := excFile.GetCols("Sheet1")
+	if err != nil {
+		return 0, err
+	}
+
+	if strings.ToUpper(cols[0][0]) != "REGNO" && strings.ToUpper(cols[0][1]) != "FIRSTNAME" && strings.ToUpper(cols[0][2]) != "LASTNAME" && strings.ToUpper(cols[0][3]) == "EMAIL" {
+		return 0, errors.New("Invalid Column names!")
+	}
+
+	rows, err := excFile.GetRows("Sheet1")
+	if err != nil {
+		return 0, err
+	}
+
+	cookie, err := cxt.Cookie("token")
+	if err != nil {
+		return 0, err
+	}
+
+	var s = securecookie.New([]byte(os.Getenv("COOKIE_HASH_SECRET")), nil)
+	value := make(map[string]string)
+	err = s.Decode("tokens", cookie, &value)
+	if err != nil {
+		return 0, err
+	}
+
+	registeredBy, _, err := controller.jwtService.GetUserIDAndRole(value["access_token"])
+	if err != nil {
+		return 0, err
+	}
+
+	for index, row := range rows {
+		if index != 0 {
+			if err == nil {
+				err = controller.userService.RegisterStudent(dto.RegisterStudentDTO{
+					RegNumber:    strings.ReplaceAll(row[0], ".0", ""),
+					FirstName:    row[1],
+					LastName:     row[2],
+					Email:        row[3],
+					RegisteredBy: registeredBy,
+				})
+				if err == nil {
+					successCount++
+				}
+			}
+		}
+	}
+
+	return successCount, nil
+}
+
+func (controller *userController) RegisteredStudents(cxt *gin.Context) ([]dto.GeneralStudentDTO, error) {
+	cookie, err := cxt.Cookie("token")
+	if err != nil {
+		return nil, err
+	}
+
+	var s = securecookie.New([]byte(os.Getenv("COOKIE_HASH_SECRET")), nil)
+	value := make(map[string]string)
+	err = s.Decode("tokens", cookie, &value)
+	if err != nil {
+		return nil, err
+	}
+
+	userId, _, err := controller.jwtService.GetUserIDAndRole(value["access_token"])
+	if err != nil {
+		return nil, err
+	}
+
+	paginatorParams := dto.PaginatorParams{
+		Page:    cxt.Query("page"),
+		Limit:   cxt.Query("limit"),
+		OrderBy: cxt.Query("orderby") + " " + cxt.Query("order"),
+	}
+
+	if paginatorParams.Page != "" || paginatorParams.Limit != "" || paginatorParams.OrderBy != " " {
+		if paginatorParams.Page == "" || paginatorParams.Limit == "" || paginatorParams.OrderBy == " " {
+			return nil, errors.New("Invalid Query!")
+		}
+	}
+
+	regStudents, err := controller.userService.RegisteredStudents(userId, paginatorParams)
+	if err != nil {
+		return nil, err
+	}
+
+	return regStudents, nil
 }
 
 //Bcrypt Functions

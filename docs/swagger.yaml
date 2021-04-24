@@ -1,5 +1,16 @@
 basePath: /
 definitions:
+  dto.GeneralStudentDTO:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      reg_number:
+        type: string
+    type: object
   dto.Login:
     properties:
       email:
@@ -35,7 +46,7 @@ definitions:
     - password
     - token
     type: object
-host: e1ect.herokuapp.com
+host: localhost:8080
 info:
   contact:
     email: surajnm15@gmail.com
@@ -44,6 +55,71 @@ info:
   title: ELECT REST API
   version: "1.0"
 paths:
+  /api/registeredstudents:
+    get:
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: string
+      - description: Order By - reg_number
+        in: query
+        name: orderby
+        type: string
+      - description: Order - asc or desc
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.GeneralStudentDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Get a list of Students you've registered
+      tags:
+      - user
+  /api/registerstudents:
+    post:
+      parameters:
+      - description: Student List
+        in: formData
+        name: register
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Register Students if you are an Admin
+      tags:
+      - user
   /login:
     post:
       parameters:

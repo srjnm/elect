@@ -27,7 +27,7 @@ import (
 // @contact.name ELECT API Support
 // @contact.email surajnm15@gmail.com
 
-// @host e1ect.herokuapp.com
+// @host localhost:8080
 // @BasePath /
 func main() {
 	var port string
@@ -49,6 +49,7 @@ func main() {
 	jwtService := services.NewJWTService("e1ect.herokuapp.com", postgresDatabase)
 	userController := controllers.NewUserController(userService, jwtService)
 	authAPI := apis.NewAuthAPI(userController)
+	userAPI := apis.NewUserAPI(userController)
 
 	port = os.Getenv("PORT")
 
@@ -64,31 +65,34 @@ func main() {
 	server.Static("/assets", "./templates/assets")
 	server.LoadHTMLGlob("templates/html/*.html")
 
-	server.Use()
-
 	//Login
-	server.POST("/login", authAPI.LoginHandler, middlewares.Authorizer(jwtService, authEnforcer))
+	server.POST("/login", middlewares.Authorizer(jwtService, authEnforcer), authAPI.LoginHandler)
 	//Logout
-	server.POST("/logout", authAPI.LogoutHandler, middlewares.Authorizer(jwtService, authEnforcer))
+	server.POST("/logout", middlewares.Authorizer(jwtService, authEnforcer), authAPI.LogoutHandler)
 	//Refresh
 	server.POST("/refresh", middlewares.EnsureValidity(jwtService), middlewares.Authorizer(jwtService, authEnforcer), authAPI.RefreshHandler)
 	//VerifyFrontEnd
-	server.GET("/verify/:token", authAPI.VerifyGETHandler, middlewares.Authorizer(jwtService, authEnforcer))
+	server.GET("/verify/:token", middlewares.Authorizer(jwtService, authEnforcer), authAPI.VerifyGETHandler)
 	//Verify Account
-	server.POST("/setpassword", authAPI.VerifyHandler, middlewares.Authorizer(jwtService, authEnforcer))
+	server.POST("/setpassword", middlewares.Authorizer(jwtService, authEnforcer), authAPI.VerifyHandler)
 	//OTP Verification FrontEnd
-	server.GET("/otp", authAPI.OTPGETHandler, middlewares.Authorizer(jwtService, authEnforcer))
+	server.GET("/otp", middlewares.Authorizer(jwtService, authEnforcer), authAPI.OTPGETHandler)
 	//OTP Verification
-	server.POST("/otp", authAPI.OTPHandler, middlewares.Authorizer(jwtService, authEnforcer))
+	server.POST("/otp", middlewares.Authorizer(jwtService, authEnforcer), authAPI.OTPHandler)
+
+	apiRoutes := server.Group("/api")
+	apiRoutes.Use(middlewares.Authorization(jwtService), middlewares.Authorizer(jwtService, authEnforcer))
+	//Register Students
+	apiRoutes.POST("/registerstudents", userAPI.RegisterStudentsHandler)
+	//Registered Students
+	apiRoutes.GET("/registeredstudents", userAPI.RegisteredStudentsHandler)
 
 	//Swagger Endpoint Integration
-	server.GET("/docs", func(cxt *gin.Context) {
+	server.GET("/docs", middlewares.Authorizer(jwtService, authEnforcer), func(cxt *gin.Context) {
 		cxt.Redirect(http.StatusPermanentRedirect, "/swagger/index.html")
-	},
-		middlewares.Authorizer(jwtService, authEnforcer),
-	)
+	})
 	url := ginSwagger.URL("/swagger/doc.json") // The url pointing to API definition
-	server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url), middlewares.Authorizer(jwtService, authEnforcer))
+	server.GET("/swagger/*any", middlewares.Authorizer(jwtService, authEnforcer), ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
 	//QOR Admin Endpoint Integration
 	server.Any("/admin/*resources", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), gin.WrapH(mux))

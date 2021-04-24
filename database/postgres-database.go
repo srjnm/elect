@@ -2,13 +2,9 @@ package database
 
 import (
 	"crypto/sha256"
-	"elect/dto"
-	"elect/mappers"
 	"elect/models"
 	"elect/roles"
 	"encoding/hex"
-	"errors"
-	"fmt"
 	"math/rand"
 	"net/http"
 	"os"
@@ -16,7 +12,6 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type postgresDatabase struct {
@@ -60,110 +55,4 @@ func NewPostgresDatabase() (Database, *http.ServeMux) {
 	return &postgresDatabase{
 		connection: db,
 	}, mux
-}
-
-func (db *postgresDatabase) FindUserForAuth(email string) (dto.AuthUserDTO, error) {
-	var count int
-	user := models.User{}
-	if db.connection.Model(&user).Where("email = ?", email).Count(&count); count == 0 {
-		return dto.AuthUserDTO{}, errors.New("Invalid user!")
-	}
-
-	if db.connection.Where("email = ?", email).Find(&user).RowsAffected == 0 {
-		return dto.AuthUserDTO{}, errors.New("Invalid user!")
-	}
-
-	if user.Verified == false {
-		return dto.AuthUserDTO{}, errors.New("Account not verified!")
-	}
-
-	if user.Password == "" {
-		return dto.AuthUserDTO{}, errors.New("Account not verified!")
-	}
-
-	return mappers.ToAuthUserDTO(user), nil
-}
-
-func (db *postgresDatabase) FindUserByID(userID string) (dto.GeneralUserDTO, error) {
-	var count int
-	user := models.User{}
-	if db.connection.Model(&user).Where("user_id = ?", userID).Count(&count); count == 0 {
-		return dto.GeneralUserDTO{}, errors.New("Invalid user!")
-	}
-
-	if db.connection.Where("user_id = ?", userID).Find(&user).RowsAffected == 0 {
-		return dto.GeneralUserDTO{}, errors.New("Invalid user!")
-	}
-
-	return mappers.ToGeneralUserDTO(user), nil
-}
-
-func (db *postgresDatabase) GetUserRole(email string) (int, error) {
-	var count int
-	user := models.User{}
-	if db.connection.Model(&user).Where("email = ?", email).Count(&count); count == 0 {
-		return -1, errors.New("Invalid user!")
-	}
-
-	if db.connection.Where("email = ?", email).Find(&user).RowsAffected == 0 {
-		return -1, errors.New("Invalid user!")
-	}
-
-	return user.Role, nil
-}
-
-func (db *postgresDatabase) VerifyAndSetPassword(setPasswordDTO dto.SetPasswordDTO) error {
-	var user models.User
-	res := db.connection.Model(&models.User{}).Where("verify_token = ?", setPasswordDTO.Token).Find(&user)
-
-	fmt.Println(".")
-
-	if res.RowsAffected == 0 {
-		return errors.New("Invalid!")
-	}
-
-	if user.Verified == true {
-		return errors.New("Already Verified!")
-	}
-
-	hashedPassword, err := HashPassword(setPasswordDTO.Password)
-	if err != nil {
-		return err
-	}
-
-	err = db.connection.Model(&models.User{}).Where("verify_token = ?", setPasswordDTO.Token).Update("password", hashedPassword).Error
-	if err != nil {
-		return err
-	}
-
-	fmt.Println("...")
-
-	err = db.connection.Model(&models.User{}).Where("verify_token = ?", setPasswordDTO.Token).Update("verified", true).Error
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(".....")
-
-	return nil
-}
-
-func (db *postgresDatabase) TokenValidity(token string) error {
-	var user models.User
-	res := db.connection.Model(&models.User{}).Where("verify_token = ?", token).Find(&user)
-
-	if res.RowsAffected == 0 {
-		return errors.New("Invalid!")
-	}
-	if user.Verified {
-		return errors.New("Already verified!")
-	}
-
-	return nil
-}
-
-//Bcrypt Functions
-func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	return string(bytes), err
 }

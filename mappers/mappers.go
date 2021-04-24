@@ -30,3 +30,22 @@ func ToUserFromGeneralUserDTO(genUserDTO dto.GeneralUserDTO) models.User {
 		Role:      genUserDTO.Role,
 	}
 }
+
+func ToUserFromRegisterStudentDTO(registerStudentDTO dto.RegisterStudentDTO) models.User {
+	return models.User{
+		Email:        registerStudentDTO.Email,
+		FirstName:    registerStudentDTO.FirstName,
+		LastName:     registerStudentDTO.LastName,
+		RegNumber:    registerStudentDTO.RegNumber,
+		RegisteredBy: registerStudentDTO.RegisteredBy,
+	}
+}
+
+func ToGeneralStudentDTOFromUser(user models.User) dto.GeneralStudentDTO {
+	return dto.GeneralStudentDTO{
+		Email:          user.Email,
+		FirstName:      user.FirstName,
+		LastName:       user.LastName,
+		RegisterNumber: user.RegNumber,
+	}
+}
