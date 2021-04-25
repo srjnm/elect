@@ -7,6 +7,7 @@ import (
 	"errors"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
@@ -17,11 +18,11 @@ import (
 )
 
 type UserController interface {
-	Login(*gin.Context) error
+	Login(*gin.Context) (string, error)
 	Refresh(*gin.Context) error
 	Verify(*gin.Context) error
 	CheckToken(*gin.Context) error
-	OTPVerication(*gin.Context) error
+	OTPVerication(*gin.Context) (string, string, string, error)
 	GetOTP(*gin.Context) (string, error)
 	Logout(cxt *gin.Context) error
 	RegisterStudents(*gin.Context) (int, error)
@@ -40,29 +41,29 @@ func NewUserController(userService services.UserService, jwtService services.JWT
 	}
 }
 
-func (controller *userController) Login(cxt *gin.Context) error {
+func (controller *userController) Login(cxt *gin.Context) (string, error) {
 	var authUser dto.AuthUserDTO
 
 	err := cxt.ShouldBindJSON(&authUser)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	dbUser, err := controller.userService.GetUserForAuth(authUser.Email)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	auth := CheckPasswordHash(authUser.Password, dbUser.Password)
 	if !auth {
-		return errors.New("Invalid Email or Password!")
+		return "", errors.New("Invalid Email or Password!")
 	}
 
 	totp := &otp.TOTP{Secret: os.Getenv("OTP_SECRET") + dbUser.Email, Period: 240}
 
 	err = email.SendOTPEmail(dbUser.Email, totp.Get(), "otptemplate.html")
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	var s = securecookie.New([]byte(os.Getenv("COOKIE_HASH_SECRET")), nil)
@@ -87,7 +88,7 @@ func (controller *userController) Login(cxt *gin.Context) error {
 		)
 	}
 
-	return nil
+	return dbUser.Email, nil
 }
 
 func (controller *userController) Refresh(cxt *gin.Context) error {
@@ -222,27 +223,27 @@ func (controller *userController) CheckToken(cxt *gin.Context) error {
 	return nil
 }
 
-func (controller *userController) OTPVerication(cxt *gin.Context) error {
+func (controller *userController) OTPVerication(cxt *gin.Context) (string, string, string, error) {
 	var otpDTO dto.OTPDTO
 	err := cxt.ShouldBindJSON(&otpDTO)
 	if err != nil {
-		return err
+		return "", "", "", err
 	}
 
 	totp := &otp.TOTP{Secret: os.Getenv("OTP_SECRET") + otpDTO.Email, Period: 240}
 	valid := totp.Verify(otpDTO.OTP)
 	if !valid {
-		return errors.New("Invalid OTP!")
+		return "", "", "", errors.New("Invalid OTP!")
 	}
 
 	dbUser, err := controller.userService.GetUserForAuth(otpDTO.Email)
 	if err != nil {
-		return err
+		return "", "", "", err
 	}
 
 	role, err := controller.userService.GetUserRole(otpDTO.Email)
 	if err != nil {
-		return err
+		return "", "", "", err
 	}
 
 	var s = securecookie.New([]byte(os.Getenv("COOKIE_HASH_SECRET")), nil)
@@ -270,10 +271,10 @@ func (controller *userController) OTPVerication(cxt *gin.Context) error {
 
 	err = controller.userService.SetActiveRefreshToken(value["refresh_token"], dbUser.Email)
 	if err != nil {
-		return err
+		return "", "", "", err
 	}
 
-	return nil
+	return dbUser.UserID, dbUser.Email, strconv.Itoa(role), nil
 }
 
 func (controller *userController) GetOTP(cxt *gin.Context) (string, error) {

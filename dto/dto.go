@@ -45,6 +45,18 @@ type Response struct {
 	Message string `json:"message"`
 }
 
+type LoginResponse struct {
+	Email   string `json:"email"`
+	Message string `json:"message"`
+}
+
+type OTPResponse struct {
+	UserId  string `json:"user_id"`
+	Email   string `json:"email"`
+	Role    string `json:"role"`
+	Message string `json:"message"`
+}
+
 // Paginator Params
 type PaginatorParams struct {
 	Page    string `json:"page"`

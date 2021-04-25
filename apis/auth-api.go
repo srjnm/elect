@@ -24,12 +24,12 @@ func NewAuthAPI(userController controllers.UserController) *AuthAPI {
 // @Consume json
 // @Produce json
 // @Param login body dto.Login true "User Login"
-// @Success 200 {object} dto.Response
+// @Success 200 {object} dto.LoginResponse
 // @Failure 401 {object} dto.Response
 // @Failure 400 {object} dto.Response
 // @Router /login [post]
 func (auth *AuthAPI) LoginHandler(cxt *gin.Context) {
-	err := auth.userController.Login(cxt)
+	email, err := auth.userController.Login(cxt)
 
 	if err != nil {
 		cxt.JSON(http.StatusBadRequest, dto.Response{
@@ -38,7 +38,8 @@ func (auth *AuthAPI) LoginHandler(cxt *gin.Context) {
 		return
 	}
 
-	cxt.JSON(http.StatusOK, dto.Response{
+	cxt.JSON(http.StatusOK, dto.LoginResponse{
+		Email:   email,
 		Message: "OTP Sent",
 	})
 	return
@@ -189,7 +190,7 @@ func (auth *AuthAPI) OTPGETHandler(cxt *gin.Context) {
 // @Failure 400 {object} dto.Response
 // @Router /otp [post]
 func (auth *AuthAPI) OTPHandler(cxt *gin.Context) {
-	err := auth.userController.OTPVerication(cxt)
+	userId, email, role, err := auth.userController.OTPVerication(cxt)
 
 	if err != nil {
 		cxt.JSON(http.StatusBadRequest, dto.Response{
@@ -210,7 +211,10 @@ func (auth *AuthAPI) OTPHandler(cxt *gin.Context) {
 				SameSite: http.SameSiteDefaultMode,
 			},
 		)
-		cxt.JSON(http.StatusOK, dto.Response{
+		cxt.JSON(http.StatusOK, dto.OTPResponse{
+			UserId:  userId,
+			Email:   email,
+			Role:    role,
 			Message: "Login Sucessful!",
 		})
 		return

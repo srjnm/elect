@@ -21,6 +21,13 @@ definitions:
     - email
     - password
     type: object
+  dto.LoginResponse:
+    properties:
+      email:
+        type: string
+      message:
+        type: string
+    type: object
   dto.OTP:
     properties:
       email:
@@ -135,7 +142,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.Response'
+            $ref: '#/definitions/dto.LoginResponse'
         "400":
           description: Bad Request
           schema:
