@@ -38,6 +38,17 @@ definitions:
     - email
     - otp
     type: object
+  dto.OTPResponse:
+    properties:
+      email:
+        type: string
+      message:
+        type: string
+      role:
+        type: string
+      user_id:
+        type: string
+    type: object
   dto.Response:
     properties:
       message:
@@ -207,7 +218,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.Response'
+            $ref: '#/definitions/dto.OTPResponse'
         "400":
           description: Bad Request
           schema:

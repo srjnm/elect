@@ -185,7 +185,7 @@ func (auth *AuthAPI) OTPGETHandler(cxt *gin.Context) {
 // @Tags auth
 // @Produce json
 // @Param otp body dto.OTP true "Verify OTP"
-// @Success 200 {object} dto.Response
+// @Success 200 {object} dto.OTPResponse
 // @Failure 401 {object} dto.Response
 // @Failure 400 {object} dto.Response
 // @Router /otp [post]
