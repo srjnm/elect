@@ -74,7 +74,7 @@ func (auth *AuthAPI) LogoutHandler(cxt *gin.Context) {
 			Domain:   "",
 			Secure:   false,
 			HttpOnly: true,
-			SameSite: http.SameSiteDefaultMode,
+			SameSite: http.SameSiteStrictMode,
 		},
 	)
 
@@ -97,6 +97,9 @@ func (auth *AuthAPI) RefreshHandler(cxt *gin.Context) {
 	err := auth.userController.Refresh(cxt)
 
 	if err.Error() == "Logged in other device!" {
+		cxt.JSON(http.StatusNetworkAuthenticationRequired, dto.Response{
+			Message: err.Error(),
+		})
 		return
 	}
 
@@ -208,7 +211,7 @@ func (auth *AuthAPI) OTPHandler(cxt *gin.Context) {
 				Domain:   "",
 				Secure:   false,
 				HttpOnly: true,
-				SameSite: http.SameSiteDefaultMode,
+				SameSite: http.SameSiteStrictMode,
 			},
 		)
 		cxt.JSON(http.StatusOK, dto.OTPResponse{

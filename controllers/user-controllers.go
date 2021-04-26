@@ -83,7 +83,7 @@ func (controller *userController) Login(cxt *gin.Context) (string, error) {
 				Domain:   "",
 				Secure:   false,
 				HttpOnly: true,
-				SameSite: http.SameSiteDefaultMode,
+				SameSite: http.SameSiteStrictMode,
 			},
 		)
 	}
@@ -128,7 +128,7 @@ func (controller *userController) Refresh(cxt *gin.Context) error {
 				Domain:   "",
 				Secure:   false,
 				HttpOnly: true,
-				SameSite: http.SameSiteDefaultMode,
+				SameSite: http.SameSiteStrictMode,
 			},
 		)
 
@@ -150,7 +150,7 @@ func (controller *userController) Refresh(cxt *gin.Context) error {
 				Domain:   "",
 				Secure:   false,
 				HttpOnly: true,
-				SameSite: http.SameSiteDefaultMode,
+				SameSite: http.SameSiteStrictMode,
 			},
 		)
 		cxt.AbortWithStatusJSON(http.StatusNetworkAuthenticationRequired, dto.Response{
@@ -183,7 +183,7 @@ func (controller *userController) Refresh(cxt *gin.Context) error {
 				Domain:   "",
 				Secure:   false,
 				HttpOnly: true,
-				SameSite: http.SameSiteDefaultMode,
+				SameSite: http.SameSiteStrictMode,
 			},
 		)
 	}
@@ -264,7 +264,7 @@ func (controller *userController) OTPVerication(cxt *gin.Context) (string, strin
 				Domain:   "",
 				Secure:   false,
 				HttpOnly: true,
-				SameSite: http.SameSiteDefaultMode,
+				SameSite: http.SameSiteStrictMode,
 			},
 		)
 	}
