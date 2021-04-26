@@ -74,7 +74,7 @@ func (auth *AuthAPI) LogoutHandler(cxt *gin.Context) {
 			Domain:   "",
 			Secure:   false,
 			HttpOnly: true,
-			SameSite: http.SameSiteStrictMode,
+			SameSite: http.SameSiteDefaultMode,
 		},
 	)
 
@@ -211,7 +211,7 @@ func (auth *AuthAPI) OTPHandler(cxt *gin.Context) {
 				Domain:   "",
 				Secure:   false,
 				HttpOnly: true,
-				SameSite: http.SameSiteStrictMode,
+				SameSite: http.SameSiteDefaultMode,
 			},
 		)
 		cxt.JSON(http.StatusOK, dto.OTPResponse{
