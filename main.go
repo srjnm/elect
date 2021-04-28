@@ -57,6 +57,7 @@ func main() {
 		AllowedOrigins:   []string{"http://localhost:8000", "http://localhost:3000", "http://localhost:8080", "https://e1ect.herokuapp.com/"},
 		AllowCredentials: true,
 		ExposedHeaders:   []string{"Set-Cookie"},
+		AllowedMethods:   []string{"POST", "OPTIONS", "GET", "PUT", "DELETE"},
 	})
 
 	server := gin.Default()

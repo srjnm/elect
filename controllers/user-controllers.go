@@ -5,7 +5,6 @@ import (
 	"elect/email"
 	"elect/services"
 	"errors"
-	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -141,7 +140,6 @@ func (controller *userController) Refresh(cxt *gin.Context) error {
 
 	err = controller.userService.CheckIfActiveRefreshToken(value["refresh_token"], email)
 	if err != nil {
-		fmt.Println("dfgdg")
 		http.SetCookie(
 			cxt.Writer,
 			&http.Cookie{
