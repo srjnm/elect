@@ -81,11 +81,10 @@ func main() {
 	server.POST("/otp", middlewares.Authorizer(jwtService, authEnforcer), authAPI.OTPHandler)
 
 	apiRoutes := server.Group("/api")
-	apiRoutes.Use(middlewares.Authorization(jwtService), middlewares.Authorizer(jwtService, authEnforcer))
 	//Register Students
-	apiRoutes.POST("/registerstudents", userAPI.RegisterStudentsHandler)
+	apiRoutes.POST("/registerstudents", middlewares.Authorization(jwtService), middlewares.Authorizer(jwtService, authEnforcer), userAPI.RegisterStudentsHandler)
 	//Registered Students
-	apiRoutes.GET("/registeredstudents", userAPI.RegisteredStudentsHandler)
+	apiRoutes.GET("/registeredstudents", middlewares.Authorization(jwtService), middlewares.Authorizer(jwtService, authEnforcer), userAPI.RegisteredStudentsHandler)
 
 	//Swagger Endpoint Integration
 	server.GET("/docs", middlewares.Authorizer(jwtService, authEnforcer), func(cxt *gin.Context) {
