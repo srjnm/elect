@@ -16,8 +16,8 @@ func EnsureValidity(jwtService services.JWTService) gin.HandlerFunc {
 
 		cookie, err := cxt.Cookie("token")
 		if err != nil {
-			cxt.AbortWithStatusJSON(http.StatusUnauthorized, dto.Response{
-				Message: "Unauthorized User",
+			cxt.AbortWithStatusJSON(http.StatusNetworkAuthenticationRequired, dto.Response{
+				Message: "Not logged in!",
 			})
 			return
 		}

@@ -15,10 +15,6 @@ import (
 
 func Authorizer(jwtService services.JWTService, e *casbin.Enforcer) gin.HandlerFunc {
 	return func(cxt *gin.Context) {
-		if cxt.Request.URL.Path == "/refresh" {
-			return
-		}
-
 		role := ""
 
 		var s = securecookie.New([]byte(os.Getenv("COOKIE_HASH_SECRET")), nil)

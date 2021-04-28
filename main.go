@@ -70,7 +70,7 @@ func main() {
 	//Logout
 	server.POST("/logout", middlewares.Authorizer(jwtService, authEnforcer), authAPI.LogoutHandler)
 	//Refresh
-	server.POST("/refresh", middlewares.EnsureValidity(jwtService), middlewares.Authorizer(jwtService, authEnforcer), authAPI.RefreshHandler)
+	server.POST("/refresh", middlewares.EnsureValidity(jwtService), authAPI.RefreshHandler)
 	//VerifyFrontEnd
 	server.GET("/verify/:token", middlewares.Authorizer(jwtService, authEnforcer), authAPI.VerifyGETHandler)
 	//Verify Account

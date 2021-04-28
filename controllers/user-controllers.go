@@ -5,6 +5,7 @@ import (
 	"elect/email"
 	"elect/services"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -81,9 +82,9 @@ func (controller *userController) Login(cxt *gin.Context) (string, error) {
 				MaxAge:   240,
 				Path:     "/",
 				Domain:   "",
-				Secure:   false,
+				Secure:   true,
 				HttpOnly: true,
-				SameSite: http.SameSiteDefaultMode,
+				SameSite: http.SameSiteNoneMode,
 			},
 		)
 	}
@@ -126,9 +127,9 @@ func (controller *userController) Refresh(cxt *gin.Context) error {
 				MaxAge:   -1,
 				Path:     "/",
 				Domain:   "",
-				Secure:   false,
+				Secure:   true,
 				HttpOnly: true,
-				SameSite: http.SameSiteDefaultMode,
+				SameSite: http.SameSiteNoneMode,
 			},
 		)
 
@@ -140,6 +141,7 @@ func (controller *userController) Refresh(cxt *gin.Context) error {
 
 	err = controller.userService.CheckIfActiveRefreshToken(value["refresh_token"], email)
 	if err != nil {
+		fmt.Println("dfgdg")
 		http.SetCookie(
 			cxt.Writer,
 			&http.Cookie{
@@ -148,9 +150,9 @@ func (controller *userController) Refresh(cxt *gin.Context) error {
 				MaxAge:   -1,
 				Path:     "/",
 				Domain:   "",
-				Secure:   false,
+				Secure:   true,
 				HttpOnly: true,
-				SameSite: http.SameSiteDefaultMode,
+				SameSite: http.SameSiteNoneMode,
 			},
 		)
 		cxt.AbortWithStatusJSON(http.StatusNetworkAuthenticationRequired, dto.Response{
@@ -181,9 +183,9 @@ func (controller *userController) Refresh(cxt *gin.Context) error {
 				MaxAge:   3600 * 24 * 7,
 				Path:     "/",
 				Domain:   "",
-				Secure:   false,
+				Secure:   true,
 				HttpOnly: true,
-				SameSite: http.SameSiteDefaultMode,
+				SameSite: http.SameSiteNoneMode,
 			},
 		)
 	}
@@ -262,9 +264,9 @@ func (controller *userController) OTPVerication(cxt *gin.Context) (string, strin
 				MaxAge:   3600 * 24 * 7,
 				Path:     "/",
 				Domain:   "",
-				Secure:   false,
+				Secure:   true,
 				HttpOnly: true,
-				SameSite: http.SameSiteDefaultMode,
+				SameSite: http.SameSiteNoneMode,
 			},
 		)
 	}

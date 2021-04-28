@@ -187,23 +187,6 @@ paths:
       tags:
       - auth
   /otp:
-    get:
-      produces:
-      - text/html
-      responses:
-        "200":
-          description: ""
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/dto.Response'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/dto.Response'
-      summary: Enter OTP
-      tags:
-      - auth
     post:
       parameters:
       - description: Verify OTP
@@ -227,7 +210,7 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/dto.Response'
-      summary: Enter OTP
+      summary: Submit OTP
       tags:
       - auth
   /refresh:
@@ -276,24 +259,6 @@ paths:
           schema:
             $ref: '#/definitions/dto.Response'
       summary: Verify Email and Set Password
-      tags:
-      - auth
-  /verify/{token}:
-    get:
-      produces:
-      - text/html
-      responses:
-        "200":
-          description: ""
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/dto.Response'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/dto.Response'
-      summary: Set Password
       tags:
       - auth
 swagger: "2.0"

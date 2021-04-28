@@ -72,9 +72,9 @@ func (auth *AuthAPI) LogoutHandler(cxt *gin.Context) {
 			MaxAge:   -1,
 			Path:     "/",
 			Domain:   "",
-			Secure:   false,
+			Secure:   true,
 			HttpOnly: true,
-			SameSite: http.SameSiteDefaultMode,
+			SameSite: http.SameSiteNoneMode,
 		},
 	)
 
@@ -143,14 +143,6 @@ func (auth *AuthAPI) VerifyHandler(cxt *gin.Context) {
 	}
 }
 
-// SetPassword godoc
-// @Summary Set Password
-// @Tags auth
-// @Produce text/html
-// @Success 200
-// @Failure 401 {object} dto.Response
-// @Failure 400 {object} dto.Response
-// @Router /verify/{token} [get]
 func (auth *AuthAPI) VerifyGETHandler(cxt *gin.Context) {
 	err := auth.userController.CheckToken(cxt)
 
@@ -164,14 +156,6 @@ func (auth *AuthAPI) VerifyGETHandler(cxt *gin.Context) {
 	cxt.HTML(http.StatusOK, "index.html", gin.H{"token": cxt.Param("token")})
 }
 
-// EnterOTP godoc
-// @Summary Enter OTP
-// @Tags auth
-// @Produce text/html
-// @Success 200
-// @Failure 401 {object} dto.Response
-// @Failure 400 {object} dto.Response
-// @Router /otp [get]
 func (auth *AuthAPI) OTPGETHandler(cxt *gin.Context) {
 	email, err := auth.userController.GetOTP(cxt)
 
@@ -185,8 +169,8 @@ func (auth *AuthAPI) OTPGETHandler(cxt *gin.Context) {
 	cxt.HTML(http.StatusOK, "otp.html", gin.H{"email": email})
 }
 
-// EnterOTP godoc
-// @Summary Enter OTP
+// SubmitOTP godoc
+// @Summary Submit OTP
 // @Tags auth
 // @Produce json
 // @Param otp body dto.OTP true "Verify OTP"
@@ -211,9 +195,9 @@ func (auth *AuthAPI) OTPHandler(cxt *gin.Context) {
 				MaxAge:   -1,
 				Path:     "/",
 				Domain:   "",
-				Secure:   false,
+				Secure:   true,
 				HttpOnly: true,
-				SameSite: http.SameSiteDefaultMode,
+				SameSite: http.SameSiteNoneMode,
 			},
 		)
 		cxt.JSON(http.StatusOK, dto.OTPResponse{

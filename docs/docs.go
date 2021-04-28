@@ -202,32 +202,6 @@ var doc = `{
             }
         },
         "/otp": {
-            "get": {
-                "produces": [
-                    "text/html"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "Enter OTP",
-                "responses": {
-                    "200": {
-                        "description": ""
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Response"
-                        }
-                    }
-                }
-            },
             "post": {
                 "produces": [
                     "application/json"
@@ -235,7 +209,7 @@ var doc = `{
                 "tags": [
                     "auth"
                 ],
-                "summary": "Enter OTP",
+                "summary": "Submit OTP",
                 "parameters": [
                     {
                         "description": "Verify OTP",
@@ -327,34 +301,6 @@ var doc = `{
                         "schema": {
                             "$ref": "#/definitions/dto.Response"
                         }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/verify/{token}": {
-            "get": {
-                "produces": [
-                    "text/html"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "Set Password",
-                "responses": {
-                    "200": {
-                        "description": ""
                     },
                     "400": {
                         "description": "Bad Request",

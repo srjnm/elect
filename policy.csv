@@ -16,4 +16,3 @@ p, 0, /logout, POST, allow
 p, 1, /logout, POST, allow
 p, 1, /api/registerstudents, POST, allow
 p, 1, /api/registeredstudents*, GET, allow
-p, 2, /api/registeredstudents*, GET, allow
