@@ -54,7 +54,7 @@ func main() {
 	port = os.Getenv("PORT")
 
 	config := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:8000", "http://localhost:3000", "http://localhost:8080", "https://e1ect.herokuapp.com/"},
+		AllowedOrigins:   []string{"http://localhost:8000", "http://localhost:3000", "http://localhost:8080", "https://e1ect.herokuapp.com/", "http://192.168.1.248:3000"},
 		AllowCredentials: true,
 		ExposedHeaders:   []string{"Set-Cookie"},
 		AllowedMethods:   []string{"POST", "OPTIONS", "GET", "PUT", "DELETE"},
@@ -87,6 +87,8 @@ func main() {
 	apiRoutes.POST("/registerstudents", middlewares.Authorization(jwtService), middlewares.Authorizer(jwtService, authEnforcer), userAPI.RegisterStudentsHandler)
 	//Registered Students
 	apiRoutes.GET("/registeredstudents", middlewares.Authorization(jwtService), middlewares.Authorizer(jwtService, authEnforcer), userAPI.RegisteredStudentsHandler)
+	//Delete Registered Student
+	apiRoutes.DELETE("/registeredstudent/:id", middlewares.Authorization(jwtService), middlewares.Authorizer(jwtService, authEnforcer), userAPI.DeleteRegisteredStudentHandler)
 
 	//Swagger Endpoint Integration
 	server.GET("/docs", middlewares.Authorizer(jwtService, authEnforcer), func(cxt *gin.Context) {

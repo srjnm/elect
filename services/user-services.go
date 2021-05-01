@@ -21,6 +21,7 @@ type UserService interface {
 	TokenValidity(token string) error
 	RegisterStudent(registerStudentDTO dto.RegisterStudentDTO) error
 	RegisteredStudents(userId string, paginatorParams dto.PaginatorParams) ([]dto.GeneralStudentDTO, error)
+	DeleteRegisteredStudent(userId string, studentUserId string) error
 	SetActiveRefreshToken(token string, email string) error
 	CheckIfActiveRefreshToken(token string, email string) error
 	ClearActiveRefreshToken(email string) error
@@ -130,4 +131,6 @@ func (service *userService) RegisteredStudents(userId string, paginatorParams dt
 	return generalStudentsDTO, nil
 }
 
-// func (service *userService) DeleteRegisteredStudent(userId string, ) error
+func (service *userService) DeleteRegisteredStudent(userId string, studentUserId string) error {
+	return service.DeleteRegisteredStudent(userId, studentUserId)
+}

@@ -10,6 +10,8 @@ definitions:
         type: string
       reg_number:
         type: string
+      user_id:
+        type: string
     type: object
   dto.Login:
     properties:
@@ -73,6 +75,32 @@ info:
   title: ELECT REST API
   version: "1.0"
 paths:
+  /api/registeredstudent/{id}:
+    delete:
+      parameters:
+      - description: Student ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Delete the student you have registered
+      tags:
+      - user
   /api/registeredstudents:
     get:
       parameters:

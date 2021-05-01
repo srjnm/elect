@@ -27,6 +27,7 @@ type UserController interface {
 	Logout(cxt *gin.Context) error
 	RegisterStudents(*gin.Context) (int, error)
 	RegisteredStudents(cxt *gin.Context) ([]dto.GeneralStudentDTO, error)
+	DeleteRegisteredStudent(cxt *gin.Context) error
 }
 
 type userController struct {
@@ -421,6 +422,32 @@ func (controller *userController) RegisteredStudents(cxt *gin.Context) ([]dto.Ge
 	}
 
 	return regStudents, nil
+}
+
+func (controller *userController) DeleteRegisteredStudent(cxt *gin.Context) error {
+	cookie, err := cxt.Cookie("token")
+	if err != nil {
+		return err
+	}
+
+	var s = securecookie.New([]byte(os.Getenv("COOKIE_HASH_SECRET")), nil)
+	value := make(map[string]string)
+	err = s.Decode("tokens", cookie, &value)
+	if err != nil {
+		return err
+	}
+
+	userId, _, err := controller.jwtService.GetUserIDAndRole(value["access_token"])
+	if err != nil {
+		return err
+	}
+
+	studentUserId := cxt.Param("id")
+	if studentUserId == "" {
+		return errors.New("Invalid Student ID!")
+	}
+
+	return controller.userService.DeleteRegisteredStudent(userId, studentUserId)
 }
 
 //Bcrypt Functions

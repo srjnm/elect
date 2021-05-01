@@ -43,6 +43,7 @@ func ToUserFromRegisterStudentDTO(registerStudentDTO dto.RegisterStudentDTO) mod
 
 func ToGeneralStudentDTOFromUser(user models.User) dto.GeneralStudentDTO {
 	return dto.GeneralStudentDTO{
+		UserID:         user.UserID.String(),
 		Email:          user.Email,
 		FirstName:      user.FirstName,
 		LastName:       user.LastName,
