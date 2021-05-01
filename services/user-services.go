@@ -132,5 +132,5 @@ func (service *userService) RegisteredStudents(userId string, paginatorParams dt
 }
 
 func (service *userService) DeleteRegisteredStudent(userId string, studentUserId string) error {
-	return service.DeleteRegisteredStudent(userId, studentUserId)
+	return service.database.DeleteRegisteredStudent(userId, studentUserId)
 }
