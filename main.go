@@ -84,11 +84,11 @@ func main() {
 
 	apiRoutes := server.Group("/api")
 	//Register Students
-	apiRoutes.POST("/registerstudents", middlewares.Authorization(jwtService), middlewares.Authorizer(jwtService, authEnforcer), userAPI.RegisterStudentsHandler)
+	apiRoutes.POST("/registerstudents", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), userAPI.RegisterStudentsHandler)
 	//Registered Students
-	apiRoutes.GET("/registeredstudents", middlewares.Authorization(jwtService), middlewares.Authorizer(jwtService, authEnforcer), userAPI.RegisteredStudentsHandler)
+	apiRoutes.GET("/registeredstudents", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), userAPI.RegisteredStudentsHandler)
 	//Delete Registered Student
-	apiRoutes.DELETE("/registeredstudent/:id", middlewares.Authorization(jwtService), middlewares.Authorizer(jwtService, authEnforcer), userAPI.DeleteRegisteredStudentHandler)
+	apiRoutes.DELETE("/registeredstudent/:id", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), userAPI.DeleteRegisteredStudentHandler)
 
 	//Swagger Endpoint Integration
 	server.GET("/docs", middlewares.Authorizer(jwtService, authEnforcer), func(cxt *gin.Context) {

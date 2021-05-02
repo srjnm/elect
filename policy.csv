@@ -1,8 +1,8 @@
 p, 2, *, *, allow
 p, *, /docs, GET, allow
 p, *, /swagger/*, GET, allow
+p, *, /setpassword, POST, allow
 p, -1, /verify/*, GET, allow
-p, -1, /setpassword, POST, allow
 p, -1, /login, POST, allow
 p, -2, /otp, POST, allow
 p, -2, /otp, GET, allow
