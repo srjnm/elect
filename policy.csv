@@ -13,7 +13,14 @@ p, 2, /setpassword, POST, deny
 p, 2, /otp, POST, deny
 p, 2, /otp, GET, deny
 p, 0, /logout, POST, allow
+p, 0, /api/elections, GET, allow
 p, 1, /logout, POST, allow
 p, 1, /api/registerstudents, POST, allow
 p, 1, /api/registeredstudents*, GET, allow
 p, 1, /api/registeredstudent/*, DELETE, allow
+p, 1, /api/election, POST, allow
+p, 1, /api/election, PUT, allow
+p, 1, /api/election/*, DELETE, allow
+p, 1, /api/participants/*, POST, allow
+p, 1, /api/elections, GET, allow
+p, 1, /api/participant, DELETE, allow

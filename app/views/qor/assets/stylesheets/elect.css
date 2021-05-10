@@ -1,0 +1,3 @@
+[qor-icon-name*="Election"] > a::before {
+    content: "\E84F";
+}

@@ -26,3 +26,25 @@ type User struct {
 	ActiveRefreshToken string    `gorm:"default:null"`
 	Base
 }
+
+type Election struct {
+	ElectionID     uuid.UUID `gorm:"primary_key; type:uuid; default:uuid_generate_v4()"`
+	Title          string    `gorm:"not null"`
+	StartingAt     time.Time `gorm:"not null"`
+	EndingAt       time.Time `gorm:"not null"`
+	LockingAt      time.Time `gorm:"not null"`
+	GenderSpecific bool      `gorm:"not null; default:false"`
+	Completed      bool      `gorm:"not null; default:false"`
+	CreatedBy      string    `gorm:"not null"`
+	Base
+}
+
+type Participant struct {
+	ParticipantID uuid.UUID `gorm:"primary_key; type:uuid; default:uuid_generate_v4()"`
+	User          User      `gorm:"foreignKey: UserID; constraint:OnDelete:CASCADE;"`
+	UserID        uuid.UUID
+	Election      Election `gorm:"foreignKey: ElectionID; constraint:OnDelete:CASCADE; unique"`
+	ElectionID    uuid.UUID
+	Voted         bool `gorm:"not null; default: false"`
+	Base
+}

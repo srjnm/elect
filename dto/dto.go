@@ -64,3 +64,48 @@ type PaginatorParams struct {
 	Limit   string `json:"limit"`
 	OrderBy string `json:"order_by"`
 }
+
+// Election DTOs
+type CreateElectionDTO struct {
+	Title          string `json:"title" binding:"required"`
+	StartingAt     string `json:"starting_at" binding:"required"`
+	EndingAt       string `json:"ending_at" binding:"required"`
+	LockingAt      string `json:"locking_at" binding:"required"`
+	GenderSpecific bool   `json:"gender_specific"`
+}
+
+type EditElectionDTO struct {
+	ElectionId     string `json:"election_id" binding:"required"`
+	Title          string `json:"title,omitempty"`
+	StartingAt     string `json:"starting_at,omitempty"`
+	EndingAt       string `json:"ending_at,omitempty"`
+	LockingAt      string `json:"locking_at,omitempty"`
+	GenderSpecific bool   `json:"gender_specific,omitempty"`
+}
+
+type CreateParticipantDTO struct {
+	RegisterNumber string `json:"register_number"`
+}
+
+type DeleteParticipantDTO struct {
+	ElectionId    string `json:"election_id" binding:"required"`
+	ParticipantId string `json:"participant_id" binding:"required"`
+}
+
+type GeneralParticipantDTO struct {
+	UserID    string `json:"user_id"`
+	RegNumber string `json:"register_number"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+}
+
+type GeneralElectionDTO struct {
+	ElectionID     string                  `json:"election_id"`
+	Title          string                  `json:"title"`
+	StartingAt     string                  `json:"starting_at"`
+	EndingAt       string                  `json:"ending_at"`
+	LockingAt      string                  `json:"locking_at"`
+	GenderSpecific bool                    `json:"gender_specific,omitempty"`
+	CreatedBy      string                  `json:"created_by,omitempty"`
+	Participants   []GeneralParticipantDTO `json:"participants,omitempty"`
+}

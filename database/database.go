@@ -6,15 +6,18 @@ import (
 	"elect/email"
 	"elect/models"
 	"encoding/hex"
+	"log"
 	"math/rand"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/jinzhu/gorm"
 	"github.com/qor/admin"
 	"github.com/qor/qor"
 	"github.com/qor/qor/resource"
 	"github.com/qor/validations"
+	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -33,6 +36,15 @@ type Database interface {
 	RegisterStudent(user models.User) error
 	RegisteredStudents(userId string, paginatorParams dto.PaginatorParams) ([]models.User, error)
 	DeleteRegisteredStudent(userId string, studentUserId string) error
+
+	// Election
+	CreateElection(election models.Election) error
+	EditElection(userId string, election models.Election) error
+	DeleteElection(userId string, electionId string) error
+	AddParticipant(userId string, electId string, regno string) error
+	GetElectionForAdmins(userId string, paginatorParams dto.PaginatorParams) ([]models.Election, error)
+	GetElectionForStudents(userId string, paginatorParams dto.PaginatorParams) ([]models.Election, error)
+	DeleteParticipant(userId string, electionId string, participantId string) error
 }
 
 func SetUpQORAdmin(db *gorm.DB) *http.ServeMux {
@@ -40,6 +52,7 @@ func SetUpQORAdmin(db *gorm.DB) *http.ServeMux {
 	mux := http.NewServeMux()
 	adm.MountTo("/admin", mux)
 
+	// User Management
 	usr := adm.AddResource(models.User{}, &admin.Config{Menu: []string{"User Management"}})
 	usr.IndexAttrs("-Password", "-VerifyToken", "-ActiveRefreshToken")
 	usr.NewAttrs("-Password", "-ActiveRefreshToken", "-RegisteredBy")
@@ -74,6 +87,91 @@ func SetUpQORAdmin(db *gorm.DB) *http.ServeMux {
 
 			if !u.Verified {
 				email.SendVerificationEmail(u.FirstName, u.Email, u.VerifyToken, "template.html")
+			}
+		},
+	})
+
+	// Election Management
+	elect := adm.AddResource(models.Election{}, &admin.Config{Menu: []string{"Election Management"}, IconName: "Election"})
+	elect.NewAttrs("-Completed")
+	elect.Meta(&admin.Meta{
+		Name: "StartingAt",
+		Type: "datetime",
+		Valuer: func(record interface{}, context *qor.Context) interface{} {
+			e := record.(*models.Election)
+			tZone, err := time.LoadLocation("Asia/Kolkata")
+			if err != nil {
+				log.Fatalln("IST TimeZone Error!")
+			}
+			e.StartingAt = e.StartingAt.In(tZone)
+			return e.StartingAt
+		},
+		Setter: func(record interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+			e := record.(*models.Election)
+			e.StartingAt = e.StartingAt.UTC()
+		},
+	})
+	elect.Meta(&admin.Meta{
+		Name: "EndingAt",
+		Type: "datetime",
+		Valuer: func(record interface{}, context *qor.Context) interface{} {
+			e := record.(*models.Election)
+			tZone, err := time.LoadLocation("Asia/Kolkata")
+			if err != nil {
+				log.Fatalln("IST TimeZone Error!")
+			}
+			e.EndingAt = e.EndingAt.In(tZone)
+			return e.EndingAt
+		},
+		Setter: func(record interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+			e := record.(*models.Election)
+			e.EndingAt = e.EndingAt.UTC()
+		},
+	})
+	elect.Meta(&admin.Meta{
+		Name: "LockingAt",
+		Type: "datetime",
+		Valuer: func(record interface{}, context *qor.Context) interface{} {
+			e := record.(*models.Election)
+			tZone, err := time.LoadLocation("Asia/Kolkata")
+			if err != nil {
+				log.Fatalln("IST TimeZone Error!")
+			}
+			e.LockingAt = e.LockingAt.In(tZone)
+			return e.LockingAt
+		},
+		Setter: func(record interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+			e := record.(*models.Election)
+			e.LockingAt = e.LockingAt.UTC()
+		},
+	})
+
+	part := adm.AddResource(models.Participant{}, &admin.Config{Menu: []string{"Election Management"}, IconName: "Election"})
+	part.IndexAttrs("-User", "-Election")
+	part.NewAttrs("-User", "-Election", "-Voted")
+	part.Meta(&admin.Meta{
+		Name: "UserID",
+		Type: "string",
+		Setter: func(resource interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+			values := metaValue.Value.([]string)
+			if len(values) > 0 {
+				if id := values[0]; id != "" {
+					p := resource.(*models.Participant)
+					p.UserID = uuid.FromStringOrNil(id)
+				}
+			}
+		},
+	})
+	part.Meta(&admin.Meta{
+		Name: "ElectionID",
+		Type: "string",
+		Setter: func(resource interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+			values := metaValue.Value.([]string)
+			if len(values) > 0 {
+				if id := values[0]; id != "" {
+					p := resource.(*models.Participant)
+					p.ElectionID = uuid.FromStringOrNil(id)
+				}
 			}
 		},
 	})

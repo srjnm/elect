@@ -3,6 +3,10 @@ package mappers
 import (
 	"elect/dto"
 	"elect/models"
+	"strings"
+	"time"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 func ToAuthUserDTO(user models.User) dto.AuthUserDTO {
@@ -48,5 +52,49 @@ func ToGeneralStudentDTOFromUser(user models.User) dto.GeneralStudentDTO {
 		FirstName:      user.FirstName,
 		LastName:       user.LastName,
 		RegisterNumber: user.RegNumber,
+	}
+}
+
+func ToElectionFromCreateElectionDTO(electionDTO dto.CreateElectionDTO) models.Election {
+	sT := strings.SplitAfter(electionDTO.StartingAt, "(")[0]
+	sTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", sT[:len(sT)-2])
+	eT := strings.SplitAfter(electionDTO.EndingAt, "(")[0]
+	eTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", eT[:len(sT)-2])
+	lT := strings.SplitAfter(electionDTO.LockingAt, "(")[0]
+	lTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", lT[:len(sT)-2])
+	return models.Election{
+		Title:          electionDTO.Title,
+		StartingAt:     sTime,
+		EndingAt:       eTime,
+		LockingAt:      lTime,
+		GenderSpecific: electionDTO.GenderSpecific,
+	}
+}
+
+func ToElectionFromEditElectionDTO(editElectionDTO dto.EditElectionDTO) models.Election {
+	sT := strings.SplitAfter(editElectionDTO.StartingAt, "(")[0]
+	sTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", sT[:len(sT)-2])
+	eT := strings.SplitAfter(editElectionDTO.EndingAt, "(")[0]
+	eTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", eT[:len(sT)-2])
+	lT := strings.SplitAfter(editElectionDTO.LockingAt, "(")[0]
+	lTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", lT[:len(sT)-2])
+	return models.Election{
+		ElectionID:     uuid.FromStringOrNil(editElectionDTO.ElectionId),
+		Title:          editElectionDTO.Title,
+		StartingAt:     sTime.UTC(),
+		EndingAt:       eTime.UTC(),
+		LockingAt:      lTime.UTC(),
+		GenderSpecific: editElectionDTO.GenderSpecific,
+	}
+}
+
+func ToGeneralElectionDTOFromElection(election models.Election) dto.GeneralElectionDTO {
+	return dto.GeneralElectionDTO{
+		ElectionID:     election.ElectionID.String(),
+		Title:          election.Title,
+		StartingAt:     election.StartingAt.String(),
+		EndingAt:       election.EndingAt.String(),
+		LockingAt:      election.LockingAt.String(),
+		GenderSpecific: election.GenderSpecific,
 	}
 }

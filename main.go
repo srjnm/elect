@@ -6,8 +6,8 @@ import (
 	"elect/database"
 	"elect/middlewares"
 	"elect/services"
+	"log"
 	"net/http"
-	_ "net/http"
 	"os"
 
 	_ "elect/docs"
@@ -41,15 +41,20 @@ func main() {
 		panic(err)
 	}
 
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
 	gin.SetMode(gin.ReleaseMode)
 
 	//Declaring all layers
 	postgresDatabase, mux := database.NewPostgresDatabase()
 	userService := services.NewUserService(postgresDatabase)
+	electionService := services.NewElectionService(postgresDatabase)
 	jwtService := services.NewJWTService("e1ect.herokuapp.com", postgresDatabase)
 	userController := controllers.NewUserController(userService, jwtService)
+	electionController := controllers.NewElectionController(electionService, jwtService)
 	authAPI := apis.NewAuthAPI(userController)
 	userAPI := apis.NewUserAPI(userController)
+	electionAPI := apis.NewElectionAPI(electionController)
 
 	port = os.Getenv("PORT")
 
@@ -89,6 +94,19 @@ func main() {
 	apiRoutes.GET("/registeredstudents", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), userAPI.RegisteredStudentsHandler)
 	//Delete Registered Student
 	apiRoutes.DELETE("/registeredstudent/:id", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), userAPI.DeleteRegisteredStudentHandler)
+
+	//GetElections
+	apiRoutes.GET("/elections", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.GetElectionsHandler)
+	//Create Election
+	apiRoutes.POST("/election", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.CreateElectionHandler)
+	//Edit Election
+	apiRoutes.PUT("/election", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.EditElectionHandler)
+	//Delete Election
+	apiRoutes.DELETE("/election/:id", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.DeleteElectionHandler)
+	//Add Participants
+	apiRoutes.POST("/participants/:id", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.AddParticipantsHandler)
+	//Delete Participant
+	apiRoutes.DELETE("/participant", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.DeleteParticipantHandler)
 
 	//Swagger Endpoint Integration
 	server.GET("/docs", middlewares.Authorizer(jwtService, authEnforcer), func(cxt *gin.Context) {

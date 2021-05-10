@@ -1,5 +1,65 @@
 basePath: /
 definitions:
+  dto.CreateElectionDTO:
+    properties:
+      ending_at:
+        type: string
+      gender_specific:
+        type: boolean
+      locking_at:
+        type: string
+      starting_at:
+        type: string
+      title:
+        type: string
+    required:
+    - ending_at
+    - locking_at
+    - starting_at
+    - title
+    type: object
+  dto.DeleteParticipantDTO:
+    properties:
+      election_id:
+        type: string
+      participant_id:
+        type: string
+    required:
+    - election_id
+    - participant_id
+    type: object
+  dto.EditElectionDTO:
+    properties:
+      election_id:
+        type: string
+      ending_at:
+        type: string
+      gender_specific:
+        type: boolean
+      locking_at:
+        type: string
+      starting_at:
+        type: string
+      title:
+        type: string
+    required:
+    - election_id
+    type: object
+  dto.Elections:
+    properties:
+      election_id:
+        type: string
+      ending_at:
+        type: string
+      gender_specific:
+        type: boolean
+      locking_at:
+        type: string
+      starting_at:
+        type: string
+      title:
+        type: string
+    type: object
   dto.GeneralStudentDTO:
     properties:
       email:
@@ -75,6 +135,182 @@ info:
   title: ELECT REST API
   version: "1.0"
 paths:
+  /api/election:
+    post:
+      parameters:
+      - description: Election Details
+        in: body
+        name: election
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateElectionDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Create Election if you are an Admin
+      tags:
+      - election
+    put:
+      parameters:
+      - description: Edit Election
+        in: body
+        name: election
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EditElectionDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Edit the election you created
+      tags:
+      - election
+  /api/election/{id}:
+    delete:
+      parameters:
+      - description: Election ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Delete the election you created
+      tags:
+      - election
+  /api/elections:
+    get:
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: string
+      - description: Order By - starting_at
+        in: query
+        name: orderby
+        type: string
+      - description: Order - asc or desc
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.Elections'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Get a list of election you are part of OR you have created
+      tags:
+      - election
+  /api/participant:
+    delete:
+      parameters:
+      - description: Delete Participant
+        in: body
+        name: election
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DeleteParticipantDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Delete the participant of the election you created
+      tags:
+      - election
+  /api/participants/{id}:
+    post:
+      parameters:
+      - description: Election ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Participants List
+        in: formData
+        name: participants
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Add participants to the election you created
+      tags:
+      - election
   /api/registeredstudent/{id}:
     delete:
       parameters:

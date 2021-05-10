@@ -25,7 +25,7 @@ func NewPostgresDatabase() (Database, *http.ServeMux) {
 		panic(err.Error())
 	}
 
-	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&models.User{}, &models.Election{}, &models.Participant{})
 
 	count := 0
 	if db.Model(models.User{}).Where("email = ?", os.Getenv("ADMIN_EMAIL")).Count(&count); count == 0 {
