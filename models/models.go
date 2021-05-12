@@ -34,7 +34,6 @@ type Election struct {
 	EndingAt       time.Time `gorm:"not null"`
 	LockingAt      time.Time `gorm:"not null"`
 	GenderSpecific bool      `gorm:"not null; default:false"`
-	Completed      bool      `gorm:"not null; default:false"`
 	CreatedBy      string    `gorm:"not null"`
 	Base
 }
@@ -42,9 +41,29 @@ type Election struct {
 type Participant struct {
 	ParticipantID uuid.UUID `gorm:"primary_key; type:uuid; default:uuid_generate_v4()"`
 	User          User      `gorm:"foreignKey: UserID; constraint:OnDelete:CASCADE;"`
-	UserID        uuid.UUID
-	Election      Election `gorm:"foreignKey: ElectionID; constraint:OnDelete:CASCADE; unique"`
-	ElectionID    uuid.UUID
-	Voted         bool `gorm:"not null; default: false"`
+	UserID        uuid.UUID `gorm:"uniqueIndex:idx_user_election"`
+	Election      Election  `gorm:"foreignKey: ElectionID; constraint:OnDelete:CASCADE;"`
+	ElectionID    uuid.UUID `gorm:"uniqueIndex:idx_user_election"`
+	Voted         bool      `gorm:"not null; default: false"`
 	Base
+}
+
+type Blacklist struct {
+	BlacklistID uuid.UUID `gorm:"primary_key; type:uuid; default:uuid_generate_v4()"`
+	User        User      `gorm:"foreignKey: UserID; constraint:OnDelete:CASCADE;"`
+	UserID      uuid.UUID `gorm:"unique"`
+}
+
+type Candidate struct {
+	CandidateID    uuid.UUID `gorm:"primary_key; type:uuid; default:uuid_generate_v4()"`
+	User           User      `gorm:"foreignKey: UserID; constraint:OnDelete:CASCADE;"`
+	UserID         uuid.UUID `gorm:"uniqueIndex:idx_user_election"`
+	Election       Election  `gorm:"foreignKey: ElectionID; constraint:OnDelete:CASCADE; unique"`
+	ElectionID     uuid.UUID `gorm:"uniqueIndex:idx_user_election"`
+	Sex            int       `gorm:"not null"`
+	DisplayPicture string    `gorm:"not null"`
+	Poster         string    `gorm:"not null"`
+	IDProof        string    `gorm:"not null"`
+	Approved       bool      `gorm:"not null; default: false"`
+	Votes          int       `gorm:"not null; default: 0"`
 }

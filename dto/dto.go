@@ -92,11 +92,31 @@ type DeleteParticipantDTO struct {
 	ParticipantId string `json:"participant_id" binding:"required"`
 }
 
+type CreateCandidateDTO struct {
+	ElectionId     string `json:"election_id"`
+	Sex            int    `json:"sex"`
+	DisplayPicture string `json:"display_picture"`
+	Poster         string `json:"poster"`
+	IdProof        string `json:"id_proof"`
+}
+
+type GeneralCandidateDTO struct {
+	CandidateID    string `json:"candidate_id"`
+	UserID         string `json:"user_id"`
+	ElectionID     string `json:"election_id"`
+	Sex            int    `json:"sex"`
+	DisplayPicture string `json:"display_picture"`
+	Poster         string `json:"poster"`
+	IDProof        string `json:"id_proof"`
+	Approved       bool   `json:"approved"`
+}
+
 type GeneralParticipantDTO struct {
-	UserID    string `json:"user_id"`
-	RegNumber string `json:"register_number"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
+	ParticipantID string `json:"participant_id"`
+	UserID        string `json:"user_id"`
+	RegNumber     string `json:"register_number"`
+	FirstName     string `json:"first_name"`
+	LastName      string `json:"last_name"`
 }
 
 type GeneralElectionDTO struct {
@@ -106,6 +126,6 @@ type GeneralElectionDTO struct {
 	EndingAt       string                  `json:"ending_at"`
 	LockingAt      string                  `json:"locking_at"`
 	GenderSpecific bool                    `json:"gender_specific,omitempty"`
-	CreatedBy      string                  `json:"created_by,omitempty"`
 	Participants   []GeneralParticipantDTO `json:"participants,omitempty"`
+	Candidates     []GeneralCandidateDTO   `json:"candidates,omitempty"`
 }

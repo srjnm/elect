@@ -23,3 +23,8 @@ type Elections struct {
 	LockingAt      string `json:"locking_at"`
 	GenderSpecific bool   `json:"gender_specific,omitempty"`
 }
+
+type CandidateInputs struct {
+	ElectionId string `json:"election_id" binding:"required"`
+	Sex        int    `json:"sex" binding:"required"`
+}

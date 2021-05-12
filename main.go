@@ -95,8 +95,10 @@ func main() {
 	//Delete Registered Student
 	apiRoutes.DELETE("/registeredstudent/:id", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), userAPI.DeleteRegisteredStudentHandler)
 
-	//GetElections
+	//Get Elections
 	apiRoutes.GET("/elections", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.GetElectionsHandler)
+	//Get Election
+	apiRoutes.GET("/election/:id", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.GetElectionHandler)
 	//Create Election
 	apiRoutes.POST("/election", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.CreateElectionHandler)
 	//Edit Election
@@ -107,6 +109,12 @@ func main() {
 	apiRoutes.POST("/participants/:id", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.AddParticipantsHandler)
 	//Delete Participant
 	apiRoutes.DELETE("/participant", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.DeleteParticipantHandler)
+	//Enroll Candidate
+	apiRoutes.POST("/candidate", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.EnrollCandidateHandler)
+	//Approve Candidate
+	apiRoutes.POST("/candidate/approve/:id", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.ApproveCandidateHandler)
+	//Unapprove Candidate
+	apiRoutes.POST("/candidate/unapprove/:id", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.UnapproveCandidateHandler)
 
 	//Swagger Endpoint Integration
 	server.GET("/docs", middlewares.Authorizer(jwtService, authEnforcer), func(cxt *gin.Context) {

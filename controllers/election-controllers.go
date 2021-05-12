@@ -1,11 +1,15 @@
 package controllers
 
 import (
+	"bytes"
 	"elect/dto"
 	"elect/services"
 	"errors"
+	"io"
 	"log"
+	"mime/multipart"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
@@ -18,7 +22,12 @@ type ElectionController interface {
 	EditElection(cxt *gin.Context) error
 	DeleteElection(cxt *gin.Context) error
 	AddParticipants(cxt *gin.Context) (int, error)
+	DeleteParticipant(cxt *gin.Context) error
 	GetElections(cxt *gin.Context) ([]dto.GeneralElectionDTO, error)
+	EnrollCandidate(cxt *gin.Context) error
+	ApproveCandidate(cxt *gin.Context) error
+	UnapproveCandidate(cxt *gin.Context) error
+	GetElection(cxt *gin.Context) (dto.GeneralElectionDTO, error)
 }
 
 type electionController struct {
@@ -37,13 +46,13 @@ func (controller *electionController) CreateElection(cxt *gin.Context) error {
 	var createElectionDTO dto.CreateElectionDTO
 	err := cxt.ShouldBindJSON(&createElectionDTO)
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Println(err.Error())
 		return err
 	}
 
 	cookie, err := cxt.Cookie("token")
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Println(err.Error())
 		return err
 	}
 
@@ -51,13 +60,13 @@ func (controller *electionController) CreateElection(cxt *gin.Context) error {
 	value := make(map[string]string)
 	err = s.Decode("tokens", cookie, &value)
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Println(err.Error())
 		return err
 	}
 
 	userId, _, err := controller.jwtService.GetUserIDAndRole(value["access_token"])
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Println(err.Error())
 		return err
 	}
 
@@ -94,7 +103,7 @@ func (controller *electionController) EditElection(cxt *gin.Context) error {
 func (controller *electionController) DeleteElection(cxt *gin.Context) error {
 	electionId := cxt.Param("id")
 	if electionId == "" {
-		log.Fatalln("Invalid Election ID!")
+		log.Println("Invalid Election ID!")
 		return errors.New("Invalid Election ID!")
 	}
 
@@ -121,11 +130,12 @@ func (controller *electionController) DeleteElection(cxt *gin.Context) error {
 func (controller *electionController) AddParticipants(cxt *gin.Context) (int, error) {
 	electionId := cxt.Param("id")
 	if electionId == "" {
-		log.Fatalln("Invalid Election ID!")
+		log.Println("Invalid Election ID!")
 		return 0, errors.New("Invalid Election ID!")
 	}
 
 	file, _, err := cxt.Request.FormFile("participants")
+	defer file.Close()
 	if err != nil {
 		return 0, err
 	}
@@ -205,9 +215,9 @@ func (controller *electionController) GetElections(cxt *gin.Context) ([]dto.Gene
 	}
 
 	if role == 1 || role == 2 {
-		return controller.electionService.GetElectionForAdmins(userId, paginatorParams)
+		return controller.electionService.GetElectionsForAdmins(userId, paginatorParams)
 	} else if role == 0 {
-		return controller.electionService.GetElectionForStudents(userId, paginatorParams)
+		return controller.electionService.GetElectionsForStudents(userId, paginatorParams)
 	}
 
 	return nil, errors.New("Invalid Role!")
@@ -239,4 +249,184 @@ func (controller *electionController) DeleteParticipant(cxt *gin.Context) error 
 	}
 
 	return controller.electionService.DeleteParticipant(userId, deleteParticipantDTO.ElectionId, deleteParticipantDTO.ParticipantId)
+}
+
+func (controller *electionController) EnrollCandidate(cxt *gin.Context) error {
+	electionId := cxt.PostForm("election_id")
+	sex, err := strconv.Atoi(cxt.PostForm("sex"))
+	if err != nil {
+		return err
+	}
+
+	cookie, err := cxt.Cookie("token")
+	if err != nil {
+		return err
+	}
+
+	var s = securecookie.New([]byte(os.Getenv("COOKIE_HASH_SECRET")), nil)
+	value := make(map[string]string)
+	err = s.Decode("tokens", cookie, &value)
+	if err != nil {
+		return err
+	}
+
+	userId, _, err := controller.jwtService.GetUserIDAndRole(value["access_token"])
+	if err != nil {
+		log.Println(err.Error())
+		return err
+	}
+
+	err = controller.electionService.CheckCandidateEligibility(userId, electionId)
+	if err != nil {
+		return err
+	}
+
+	dpFile, _, err := cxt.Request.FormFile("display_picture")
+	defer dpFile.Close()
+	if err != nil {
+		log.Println(err.Error())
+		return err
+	}
+	dpURL, err := uploadImage(dpFile)
+	if err != nil {
+		return err
+	}
+
+	posterFile, _, err := cxt.Request.FormFile("poster")
+	defer posterFile.Close()
+	if err != nil {
+		log.Println(err.Error())
+		return err
+	}
+	posterURL, err := uploadImage(posterFile)
+	if err != nil {
+		return err
+	}
+
+	idFile, _, err := cxt.Request.FormFile("id_proof")
+	defer idFile.Close()
+	if err != nil {
+		log.Println(err.Error())
+		return err
+	}
+	idURL, err := uploadImage(idFile)
+	if err != nil {
+		return err
+	}
+
+	createCandidateDTO := dto.CreateCandidateDTO{
+		ElectionId:     electionId,
+		Sex:            sex,
+		DisplayPicture: dpURL,
+		Poster:         posterURL,
+		IdProof:        idURL,
+	}
+
+	return controller.electionService.EnrollCandidate(userId, createCandidateDTO)
+}
+
+func (controller *electionController) ApproveCandidate(cxt *gin.Context) error {
+	participantId := cxt.Param("id")
+	if participantId == "" {
+		log.Println("Invalid ID!")
+		return errors.New("Invalid ID!")
+	}
+
+	cookie, err := cxt.Cookie("token")
+	if err != nil {
+		return err
+	}
+
+	var s = securecookie.New([]byte(os.Getenv("COOKIE_HASH_SECRET")), nil)
+	value := make(map[string]string)
+	err = s.Decode("tokens", cookie, &value)
+	if err != nil {
+		return err
+	}
+
+	userId, _, err := controller.jwtService.GetUserIDAndRole(value["access_token"])
+	if err != nil {
+		log.Println(err.Error())
+		return err
+	}
+
+	return controller.electionService.ApproveCandidate(userId, participantId)
+}
+
+func (controller *electionController) UnapproveCandidate(cxt *gin.Context) error {
+	participantId := cxt.Param("id")
+	if participantId == "" {
+		log.Println("Invalid ID!")
+		return errors.New("Invalid ID!")
+	}
+
+	cookie, err := cxt.Cookie("token")
+	if err != nil {
+		return err
+	}
+
+	var s = securecookie.New([]byte(os.Getenv("COOKIE_HASH_SECRET")), nil)
+	value := make(map[string]string)
+	err = s.Decode("tokens", cookie, &value)
+	if err != nil {
+		return err
+	}
+
+	userId, _, err := controller.jwtService.GetUserIDAndRole(value["access_token"])
+	if err != nil {
+		log.Println(err.Error())
+		return err
+	}
+
+	return controller.electionService.UnapproveCandidate(userId, participantId)
+}
+
+func (controller *electionController) GetElection(cxt *gin.Context) (dto.GeneralElectionDTO, error) {
+	electionId := cxt.Param("id")
+	if electionId == "" {
+		log.Println("Invalid ID!")
+		return dto.GeneralElectionDTO{}, errors.New("Invalid ID!")
+	}
+
+	cookie, err := cxt.Cookie("token")
+	if err != nil {
+		return dto.GeneralElectionDTO{}, err
+	}
+
+	var s = securecookie.New([]byte(os.Getenv("COOKIE_HASH_SECRET")), nil)
+	value := make(map[string]string)
+	err = s.Decode("tokens", cookie, &value)
+	if err != nil {
+		return dto.GeneralElectionDTO{}, err
+	}
+
+	userId, role, err := controller.jwtService.GetUserIDAndRole(value["access_token"])
+	if err != nil {
+		return dto.GeneralElectionDTO{}, err
+	}
+
+	if role == 1 || role == 2 {
+		return controller.electionService.GetElectionForAdmins(userId, electionId)
+	} else if role == 0 {
+		return controller.electionService.GetElectionForStudents(userId, electionId)
+	}
+
+	return dto.GeneralElectionDTO{}, errors.New("Invalid Role!")
+}
+
+//Private functions
+func uploadImage(file multipart.File) (string, error) {
+	defer file.Close()
+	buf := bytes.NewBuffer(nil)
+	if _, err := io.Copy(buf, file); err != nil {
+		log.Println(err.Error())
+		return "", err
+	}
+	url, err := services.UploadImageToCandidateAzureStorage(buf.Bytes())
+	if err != nil {
+		log.Println(err.Error())
+		return "", err
+	}
+
+	return url, nil
 }

@@ -5,6 +5,8 @@ import (
 	"elect/dto"
 	"elect/mappers"
 	"elect/models"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 type ElectionService interface {
@@ -12,9 +14,15 @@ type ElectionService interface {
 	EditElection(userId string, editElectionDTO dto.EditElectionDTO) error
 	DeleteElection(userId string, electionId string) error
 	AddParticipants(userId string, electionId string, participants []dto.CreateParticipantDTO) (int, error)
-	GetElectionForAdmins(userId string, paginatorParams dto.PaginatorParams) ([]dto.GeneralElectionDTO, error)
-	GetElectionForStudents(userId string, paginatorParams dto.PaginatorParams) ([]dto.GeneralElectionDTO, error)
+	GetElectionsForAdmins(userId string, paginatorParams dto.PaginatorParams) ([]dto.GeneralElectionDTO, error)
+	GetElectionsForStudents(userId string, paginatorParams dto.PaginatorParams) ([]dto.GeneralElectionDTO, error)
 	DeleteParticipant(userId string, electionId string, participantId string) error
+	EnrollCandidate(userId string, createCandidateDTO dto.CreateCandidateDTO) error
+	CheckCandidateEligibility(userId string, electionId string) error
+	ApproveCandidate(userId string, candidateId string) error
+	UnapproveCandidate(userId string, candidateId string) error
+	GetElectionForAdmins(userId string, electionId string) (dto.GeneralElectionDTO, error)
+	GetElectionForStudents(userId string, electionId string) (dto.GeneralElectionDTO, error)
 }
 
 type electionService struct {
@@ -61,16 +69,16 @@ func (service *electionService) AddParticipants(userId string, electionId string
 	return count, nil
 }
 
-func (service *electionService) GetElectionForAdmins(userId string, paginatorParams dto.PaginatorParams) ([]dto.GeneralElectionDTO, error) {
+func (service *electionService) GetElectionsForAdmins(userId string, paginatorParams dto.PaginatorParams) ([]dto.GeneralElectionDTO, error) {
 	var elections []models.Election
 	var err error
 	if paginatorParams.Page == "" {
-		elections, err = service.database.GetElectionForAdmins(userId, dto.PaginatorParams{})
+		elections, err = service.database.GetElectionsForAdmins(userId, dto.PaginatorParams{})
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		elections, err = service.database.GetElectionForAdmins(userId, paginatorParams)
+		elections, err = service.database.GetElectionsForAdmins(userId, paginatorParams)
 		if err != nil {
 			return nil, err
 		}
@@ -84,16 +92,16 @@ func (service *electionService) GetElectionForAdmins(userId string, paginatorPar
 	return generalElectionsDTO, nil
 }
 
-func (service *electionService) GetElectionForStudents(userId string, paginatorParams dto.PaginatorParams) ([]dto.GeneralElectionDTO, error) {
+func (service *electionService) GetElectionsForStudents(userId string, paginatorParams dto.PaginatorParams) ([]dto.GeneralElectionDTO, error) {
 	var elections []models.Election
 	var err error
 	if paginatorParams.Page == "" {
-		elections, err = service.database.GetElectionForStudents(userId, dto.PaginatorParams{})
+		elections, err = service.database.GetElectionsForStudents(userId, dto.PaginatorParams{})
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		elections, err = service.database.GetElectionForStudents(userId, paginatorParams)
+		elections, err = service.database.GetElectionsForStudents(userId, paginatorParams)
 		if err != nil {
 			return nil, err
 		}
@@ -109,4 +117,51 @@ func (service *electionService) GetElectionForStudents(userId string, paginatorP
 
 func (service *electionService) DeleteParticipant(userId string, electionId string, participantId string) error {
 	return service.database.DeleteParticipant(userId, electionId, participantId)
+}
+
+func (service *electionService) EnrollCandidate(userId string, createCandidateDTO dto.CreateCandidateDTO) error {
+	candidate := mappers.ToCandidateFromCreateCandidateDTO(createCandidateDTO)
+	candidate.UserID = uuid.FromStringOrNil(userId)
+
+	return service.database.EnrollCandidate(candidate)
+}
+
+func (service *electionService) CheckCandidateEligibility(userId string, electionId string) error {
+	return service.database.CheckCandidateEligibility(userId, electionId)
+}
+
+func (service *electionService) ApproveCandidate(userId string, candidateId string) error {
+	return service.database.ApproveCandidate(userId, candidateId)
+}
+
+func (service *electionService) UnapproveCandidate(userId string, candidateId string) error {
+	return service.database.UnapproveCandidate(userId, candidateId)
+}
+
+func (service *electionService) GetElectionForAdmins(userId string, electionId string) (dto.GeneralElectionDTO, error) {
+	election, generalParticipantDTOs, candidates, err := service.database.GetElectionForAdmins(userId, electionId)
+	if err != nil {
+		return dto.GeneralElectionDTO{}, err
+	}
+
+	var generalCandidateDTOs []dto.GeneralCandidateDTO
+	for _, candidate := range candidates {
+		generalCandidateDTOs = append(generalCandidateDTOs, mappers.ToGeneralCandidateDTOFromCandidate(candidate))
+	}
+
+	return mappers.ToGeneralElectionDTOForAdmins(election, generalParticipantDTOs, generalCandidateDTOs), nil
+}
+
+func (service *electionService) GetElectionForStudents(userId string, electionId string) (dto.GeneralElectionDTO, error) {
+	election, candidates, err := service.database.GetElectionForStudents(userId, electionId)
+	if err != nil {
+		return dto.GeneralElectionDTO{}, err
+	}
+
+	var generalCandidateDTOs []dto.GeneralCandidateDTO
+	for _, candidate := range candidates {
+		generalCandidateDTOs = append(generalCandidateDTOs, mappers.ToGeneralCandidateDTOFromCandidate(candidate))
+	}
+
+	return mappers.ToGeneralElectionDTOForStudents(election, generalCandidateDTOs), nil
 }

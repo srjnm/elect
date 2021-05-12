@@ -33,7 +33,7 @@ func (election *ElectionAPI) CreateElectionHandler(cxt *gin.Context) {
 	err := election.electionController.CreateElection(cxt)
 
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Println(err.Error())
 		cxt.JSON(http.StatusBadRequest, dto.Response{
 			Message: err.Error(),
 		})
@@ -98,7 +98,7 @@ func (election *ElectionAPI) DeleteElectionHandler(cxt *gin.Context) {
 
 // AddParticipants godoc
 // @Summary Add participants to the election you created
-// @Tags election
+// @Tags participant
 // @Consume multipart/form-data
 // @Produce json
 // @Param id path string true "Election ID"
@@ -125,7 +125,7 @@ func (election *ElectionAPI) AddParticipantsHandler(cxt *gin.Context) {
 
 // DeleteParticipant godoc
 // @Summary Delete the participant of the election you created
-// @Tags election
+// @Tags participant
 // @Produce json
 // @Param election body dto.DeleteParticipantDTO true "Delete Participant"
 // @Success 200 {object} dto.Response
@@ -133,7 +133,7 @@ func (election *ElectionAPI) AddParticipantsHandler(cxt *gin.Context) {
 // @Failure 400 {object} dto.Response
 // @Router /api/participant [delete]
 func (election *ElectionAPI) DeleteParticipantHandler(cxt *gin.Context) {
-	err := election.electionController.DeleteElection(cxt)
+	err := election.electionController.DeleteParticipant(cxt)
 
 	if err != nil {
 		cxt.JSON(http.StatusBadRequest, dto.Response{
@@ -170,5 +170,103 @@ func (election *ElectionAPI) GetElectionsHandler(cxt *gin.Context) {
 	}
 
 	cxt.JSON(http.StatusOK, elections)
+	return
+}
+
+// EnrollCandidate godoc
+// @Summary Enroll as a candidate for the election you are part of
+// @Tags candidate
+// @Consume multipart/form-data
+// @Produce json
+// @Param candidateDetails formData dto.CandidateInputs true "Candidate Details"
+// @Param display_picture formData file true "Display Picture"
+// @Param poster formData file true "poster"
+// @Param id_proof formData file true "ID Proof"
+// @Success 200 {object} dto.Response
+// @Failure 401 {object} dto.Response
+// @Failure 400 {object} dto.Response
+// @Router /api/candidate [post]
+func (election *ElectionAPI) EnrollCandidateHandler(cxt *gin.Context) {
+	err := election.electionController.EnrollCandidate(cxt)
+	if err != nil {
+		cxt.JSON(http.StatusBadRequest, dto.Response{
+			Message: err.Error(),
+		})
+		return
+	}
+
+	cxt.JSON(http.StatusOK, dto.Response{
+		Message: "Enrolled as candidate.",
+	})
+	return
+}
+
+// ApproveCandidate godoc
+// @Summary Approve enrolled candidates to the election you created
+// @Tags candidate
+// @Produce json
+// @Param id path string true "Candidate ID"
+// @Success 200 {object} dto.Response
+// @Failure 401 {object} dto.Response
+// @Failure 400 {object} dto.Response
+// @Router /api/candidate/approve/{id} [post]
+func (election *ElectionAPI) ApproveCandidateHandler(cxt *gin.Context) {
+	err := election.electionController.ApproveCandidate(cxt)
+	if err != nil {
+		cxt.JSON(http.StatusBadRequest, dto.Response{
+			Message: err.Error(),
+		})
+		return
+	}
+
+	cxt.JSON(http.StatusOK, dto.Response{
+		Message: "Candidate approved.",
+	})
+	return
+}
+
+// UnapproveCandidate godoc
+// @Summary Unapprove enrolled candidates to the election you created
+// @Tags candidate
+// @Produce json
+// @Param id path string true "Candidate ID"
+// @Success 200 {object} dto.Response
+// @Failure 401 {object} dto.Response
+// @Failure 400 {object} dto.Response
+// @Router /api/candidate/unapprove/{id} [post]
+func (election *ElectionAPI) UnapproveCandidateHandler(cxt *gin.Context) {
+	err := election.electionController.UnapproveCandidate(cxt)
+	if err != nil {
+		cxt.JSON(http.StatusBadRequest, dto.Response{
+			Message: err.Error(),
+		})
+		return
+	}
+
+	cxt.JSON(http.StatusOK, dto.Response{
+		Message: "Candidate unapproved.",
+	})
+	return
+}
+
+// GetElection godoc
+// @Summary Get details of the election you created or you are part of
+// @Tags election
+// @Produce json
+// @Param id path string true "Election ID"
+// @Success 200 {object} dto.GeneralElectionDTO
+// @Failure 401 {object} dto.Response
+// @Failure 400 {object} dto.Response
+// @Router /api/election/{id} [get]
+func (election *ElectionAPI) GetElectionHandler(cxt *gin.Context) {
+	generalElectionDTO, err := election.electionController.GetElection(cxt)
+	if err != nil {
+		cxt.JSON(http.StatusBadRequest, dto.Response{
+			Message: err.Error(),
+		})
+		return
+	}
+
+	cxt.JSON(http.StatusOK, generalElectionDTO)
 	return
 }

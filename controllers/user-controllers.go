@@ -326,6 +326,7 @@ func (controller *userController) RegisterStudents(cxt *gin.Context) (int, error
 	successCount := 0
 
 	file, _, err := cxt.Request.FormFile("register")
+	defer file.Close()
 	if err != nil {
 		return 0, err
 	}

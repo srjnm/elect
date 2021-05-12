@@ -12,6 +12,152 @@
     "host": "e1ect.herokuapp.com",
     "basePath": "/",
     "paths": {
+        "/api/candidate": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "candidate"
+                ],
+                "summary": "Enroll as a candidate for the election you are part of",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "election_id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "name": "sex",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Display Picture",
+                        "name": "display_picture",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "poster",
+                        "name": "poster",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "ID Proof",
+                        "name": "id_proof",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/candidate/approve/{id}": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "candidate"
+                ],
+                "summary": "Approve enrolled candidates to the election you created",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Candidate ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/candidate/unapprove/{id}": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "candidate"
+                ],
+                "summary": "Unapprove enrolled candidates to the election you created",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Candidate ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/election": {
             "put": {
                 "produces": [
@@ -95,6 +241,44 @@
             }
         },
         "/api/election/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "election"
+                ],
+                "summary": "Get details of the election you created or you are part of",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Election ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GeneralElectionDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "produces": [
                     "application/json"
@@ -200,7 +384,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "election"
+                    "participant"
                 ],
                 "summary": "Delete the participant of the election you created",
                 "parameters": [
@@ -242,7 +426,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "election"
+                    "participant"
                 ],
                 "summary": "Add participants to the election you created",
                 "parameters": [
@@ -701,6 +885,90 @@
                     "type": "string"
                 },
                 "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.GeneralCandidateDTO": {
+            "type": "object",
+            "properties": {
+                "approved": {
+                    "type": "boolean"
+                },
+                "candidate_id": {
+                    "type": "string"
+                },
+                "display_picture": {
+                    "type": "string"
+                },
+                "election_id": {
+                    "type": "string"
+                },
+                "id_proof": {
+                    "type": "string"
+                },
+                "poster": {
+                    "type": "string"
+                },
+                "sex": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.GeneralElectionDTO": {
+            "type": "object",
+            "properties": {
+                "candidates": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.GeneralCandidateDTO"
+                    }
+                },
+                "election_id": {
+                    "type": "string"
+                },
+                "ending_at": {
+                    "type": "string"
+                },
+                "gender_specific": {
+                    "type": "boolean"
+                },
+                "locking_at": {
+                    "type": "string"
+                },
+                "participants": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.GeneralParticipantDTO"
+                    }
+                },
+                "starting_at": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.GeneralParticipantDTO": {
+            "type": "object",
+            "properties": {
+                "first_name": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "participant_id": {
+                    "type": "string"
+                },
+                "register_number": {
+                    "type": "string"
+                },
+                "user_id": {
                     "type": "string"
                 }
             }
