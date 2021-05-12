@@ -156,3 +156,38 @@ func ToGeneralElectionDTOForStudents(election models.Election, generalCandidateD
 		Candidates:     generalCandidateDTOs,
 	}
 }
+
+func ToGeneralElectionResultsDTOForAdmins(election models.Election, generalParticipantDTOs []dto.GeneralParticipantDTO, candidateResultsDTOs []dto.CandidateResultsDTO) dto.GeneralElectionResultsDTO {
+	return dto.GeneralElectionResultsDTO{
+		ElectionID:       election.ElectionID.String(),
+		Title:            election.Title,
+		StartingAt:       election.StartingAt.String(),
+		EndingAt:         election.EndingAt.String(),
+		LockingAt:        election.LockingAt.String(),
+		GenderSpecific:   election.GenderSpecific,
+		Participants:     generalParticipantDTOs,
+		CandidateResults: candidateResultsDTOs,
+	}
+}
+
+func ToGeneralElectionResultsDTOForStudents(election models.Election, candidateResultsDTOs []dto.CandidateResultsDTO) dto.GeneralElectionResultsDTO {
+	return dto.GeneralElectionResultsDTO{
+		ElectionID:       election.ElectionID.String(),
+		Title:            election.Title,
+		StartingAt:       election.StartingAt.String(),
+		EndingAt:         election.EndingAt.String(),
+		LockingAt:        election.LockingAt.String(),
+		GenderSpecific:   election.GenderSpecific,
+		CandidateResults: candidateResultsDTOs,
+	}
+}
+
+func ToCandidateResultsDTOFromCandidate(candidate models.Candidate) dto.CandidateResultsDTO {
+	return dto.CandidateResultsDTO{
+		CandidateID:    candidate.CandidateID.String(),
+		UserID:         candidate.UserID.String(),
+		Sex:            candidate.Sex,
+		ElectionID:     candidate.ElectionID.String(),
+		DisplayPicture: candidate.DisplayPicture,
+	}
+}

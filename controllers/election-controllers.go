@@ -28,6 +28,8 @@ type ElectionController interface {
 	ApproveCandidate(cxt *gin.Context) error
 	UnapproveCandidate(cxt *gin.Context) error
 	GetElection(cxt *gin.Context) (dto.GeneralElectionDTO, error)
+	CastVote(cxt *gin.Context) error
+	GetElectionResults(cxt *gin.Context) (dto.GeneralElectionResultsDTO, error)
 }
 
 type electionController struct {
@@ -412,6 +414,57 @@ func (controller *electionController) GetElection(cxt *gin.Context) (dto.General
 	}
 
 	return dto.GeneralElectionDTO{}, errors.New("Invalid Role!")
+}
+
+func (controller *electionController) CastVote(cxt *gin.Context) error {
+	var castVoteDTO dto.CastVoteDTO
+	cxt.ShouldBindJSON(&castVoteDTO)
+
+	cookie, err := cxt.Cookie("token")
+	if err != nil {
+		return err
+	}
+
+	var s = securecookie.New([]byte(os.Getenv("COOKIE_HASH_SECRET")), nil)
+	value := make(map[string]string)
+	err = s.Decode("tokens", cookie, &value)
+	if err != nil {
+		return err
+	}
+
+	userId, _, err := controller.jwtService.GetUserIDAndRole(value["access_token"])
+	if err != nil {
+		return err
+	}
+
+	return controller.electionService.CastVote(userId, castVoteDTO)
+}
+
+func (controller *electionController) GetElectionResults(cxt *gin.Context) (dto.GeneralElectionResultsDTO, error) {
+	electionId := cxt.Param("id")
+	if electionId == "" {
+		log.Println("Invalid ID!")
+		return dto.GeneralElectionResultsDTO{}, errors.New("Invalid ID!")
+	}
+
+	cookie, err := cxt.Cookie("token")
+	if err != nil {
+		return dto.GeneralElectionResultsDTO{}, err
+	}
+
+	var s = securecookie.New([]byte(os.Getenv("COOKIE_HASH_SECRET")), nil)
+	value := make(map[string]string)
+	err = s.Decode("tokens", cookie, &value)
+	if err != nil {
+		return dto.GeneralElectionResultsDTO{}, err
+	}
+
+	userId, role, err := controller.jwtService.GetUserIDAndRole(value["access_token"])
+	if err != nil {
+		return dto.GeneralElectionResultsDTO{}, err
+	}
+
+	return controller.electionService.GetElectionResults(userId, role, electionId)
 }
 
 //Private functions

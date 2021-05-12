@@ -42,15 +42,18 @@ type Database interface {
 	EditElection(userId string, election models.Election) error
 	DeleteElection(userId string, electionId string) error
 	AddParticipant(userId string, electId string, regno string) error
+	DeleteParticipant(userId string, electionId string, participantId string) error
+	GetElectionParticipants(userId string, electionId string) ([]dto.GeneralParticipantDTO, error)
 	GetElectionsForAdmins(userId string, paginatorParams dto.PaginatorParams) ([]models.Election, error)
 	GetElectionsForStudents(userId string, paginatorParams dto.PaginatorParams) ([]models.Election, error)
-	DeleteParticipant(userId string, electionId string, participantId string) error
 	EnrollCandidate(candidate models.Candidate) error
 	CheckCandidateEligibility(userId string, electionId string) error
 	ApproveCandidate(userId string, candidateId string) error
 	UnapproveCandidate(userId string, candidateId string) error
 	GetElectionForAdmins(userId string, electionId string) (models.Election, []dto.GeneralParticipantDTO, []models.Candidate, error)
 	GetElectionForStudents(userId string, electionId string) (models.Election, []models.Candidate, error)
+	CastVote(userId string, electionId string, candidateId string) error
+	GetResults(userId string, role int, electionId string) (models.Election, []models.Candidate, error)
 }
 
 func SetUpQORAdmin(db *gorm.DB) *http.ServeMux {

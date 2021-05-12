@@ -127,7 +127,7 @@ func (election *ElectionAPI) AddParticipantsHandler(cxt *gin.Context) {
 // @Summary Delete the participant of the election you created
 // @Tags participant
 // @Produce json
-// @Param election body dto.DeleteParticipantDTO true "Delete Participant"
+// @Param participant body dto.DeleteParticipantDTO true "Delete Participant"
 // @Success 200 {object} dto.Response
 // @Failure 401 {object} dto.Response
 // @Failure 400 {object} dto.Response
@@ -268,5 +268,51 @@ func (election *ElectionAPI) GetElectionHandler(cxt *gin.Context) {
 	}
 
 	cxt.JSON(http.StatusOK, generalElectionDTO)
+	return
+}
+
+// CastVote godoc
+// @Summary Cast vote to the candidate of the election you are part of
+// @Tags participant
+// @Produce json
+// @Param vote body dto.CastVoteDTO true "Cast Vote"
+// @Success 200 {object} dto.Response
+// @Failure 401 {object} dto.Response
+// @Failure 400 {object} dto.Response
+// @Router /api/vote [post]
+func (election *ElectionAPI) CastVoteHandler(cxt *gin.Context) {
+	err := election.electionController.CastVote(cxt)
+	if err != nil {
+		cxt.JSON(http.StatusBadRequest, dto.Response{
+			Message: err.Error(),
+		})
+		return
+	}
+
+	cxt.JSON(http.StatusOK, dto.Response{
+		Message: "Vote casted.",
+	})
+	return
+}
+
+// GetElectionResults godoc
+// @Summary Get the results of the election you were part of or you created
+// @Tags election
+// @Produce json
+// @Param id path string true "Election ID"
+// @Success 200 {object} dto.GeneralElectionResultsDTO
+// @Failure 401 {object} dto.Response
+// @Failure 400 {object} dto.Response
+// @Router /api/results/{id} [get]
+func (election *ElectionAPI) GetElectionResultsHandler(cxt *gin.Context) {
+	generalElectionResultsDTO, err := election.electionController.GetElectionResults(cxt)
+	if err != nil {
+		cxt.JSON(http.StatusBadRequest, dto.Response{
+			Message: err.Error(),
+		})
+		return
+	}
+
+	cxt.JSON(http.StatusOK, generalElectionResultsDTO)
 	return
 }

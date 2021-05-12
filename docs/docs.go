@@ -405,7 +405,7 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "Delete Participant",
-                        "name": "election",
+                        "name": "participant",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -622,6 +622,88 @@ var doc = `{
                 }
             }
         },
+        "/api/results/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "election"
+                ],
+                "summary": "Get the results of the election you were part of or you created",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Election ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GeneralElectionResultsDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/vote": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "participant"
+                ],
+                "summary": "Cast vote to the candidate of the election you are part of",
+                "parameters": [
+                    {
+                        "description": "Cast Vote",
+                        "name": "vote",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CastVoteDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
                 "produces": [
@@ -814,6 +896,41 @@ var doc = `{
         }
     },
     "definitions": {
+        "dto.CandidateResultsDTO": {
+            "type": "object",
+            "properties": {
+                "candidate_id": {
+                    "type": "string"
+                },
+                "display_picture": {
+                    "type": "string"
+                },
+                "election_id": {
+                    "type": "string"
+                },
+                "sex": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.CastVoteDTO": {
+            "type": "object",
+            "required": [
+                "candidate_id",
+                "election_id"
+            ],
+            "properties": {
+                "candidate_id": {
+                    "type": "string"
+                },
+                "election_id": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.CreateElectionDTO": {
             "type": "object",
             "required": [
@@ -940,6 +1057,41 @@ var doc = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/dto.GeneralCandidateDTO"
+                    }
+                },
+                "election_id": {
+                    "type": "string"
+                },
+                "ending_at": {
+                    "type": "string"
+                },
+                "gender_specific": {
+                    "type": "boolean"
+                },
+                "locking_at": {
+                    "type": "string"
+                },
+                "participants": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.GeneralParticipantDTO"
+                    }
+                },
+                "starting_at": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.GeneralElectionResultsDTO": {
+            "type": "object",
+            "properties": {
+                "candidate_results": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.CandidateResultsDTO"
                     }
                 },
                 "election_id": {

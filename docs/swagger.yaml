@@ -1,5 +1,28 @@
 basePath: /
 definitions:
+  dto.CandidateResultsDTO:
+    properties:
+      candidate_id:
+        type: string
+      display_picture:
+        type: string
+      election_id:
+        type: string
+      sex:
+        type: integer
+      user_id:
+        type: string
+    type: object
+  dto.CastVoteDTO:
+    properties:
+      candidate_id:
+        type: string
+      election_id:
+        type: string
+    required:
+    - candidate_id
+    - election_id
+    type: object
   dto.CreateElectionDTO:
     properties:
       ending_at:
@@ -84,6 +107,29 @@ definitions:
       candidates:
         items:
           $ref: '#/definitions/dto.GeneralCandidateDTO'
+        type: array
+      election_id:
+        type: string
+      ending_at:
+        type: string
+      gender_specific:
+        type: boolean
+      locking_at:
+        type: string
+      participants:
+        items:
+          $ref: '#/definitions/dto.GeneralParticipantDTO'
+        type: array
+      starting_at:
+        type: string
+      title:
+        type: string
+    type: object
+  dto.GeneralElectionResultsDTO:
+    properties:
+      candidate_results:
+        items:
+          $ref: '#/definitions/dto.CandidateResultsDTO'
         type: array
       election_id:
         type: string
@@ -434,7 +480,7 @@ paths:
       parameters:
       - description: Delete Participant
         in: body
-        name: election
+        name: participant
         required: true
         schema:
           $ref: '#/definitions/dto.DeleteParticipantDTO'
@@ -578,6 +624,59 @@ paths:
       summary: Register Students if you are an Admin
       tags:
       - user
+  /api/results/{id}:
+    get:
+      parameters:
+      - description: Election ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GeneralElectionResultsDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Get the results of the election you were part of or you created
+      tags:
+      - election
+  /api/vote:
+    post:
+      parameters:
+      - description: Cast Vote
+        in: body
+        name: vote
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CastVoteDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Cast vote to the candidate of the election you are part of
+      tags:
+      - participant
   /login:
     post:
       parameters:

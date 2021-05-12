@@ -5,6 +5,8 @@ import (
 	"elect/dto"
 	"elect/mappers"
 	"elect/models"
+	"errors"
+	"log"
 
 	uuid "github.com/satori/go.uuid"
 )
@@ -23,6 +25,8 @@ type ElectionService interface {
 	UnapproveCandidate(userId string, candidateId string) error
 	GetElectionForAdmins(userId string, electionId string) (dto.GeneralElectionDTO, error)
 	GetElectionForStudents(userId string, electionId string) (dto.GeneralElectionDTO, error)
+	CastVote(userId string, castVoteDTO dto.CastVoteDTO) error
+	GetElectionResults(userId string, role int, electionId string) (dto.GeneralElectionResultsDTO, error)
 }
 
 type electionService struct {
@@ -164,4 +168,34 @@ func (service *electionService) GetElectionForStudents(userId string, electionId
 	}
 
 	return mappers.ToGeneralElectionDTOForStudents(election, generalCandidateDTOs), nil
+}
+
+func (service *electionService) CastVote(userId string, castVoteDTO dto.CastVoteDTO) error {
+	return service.database.CastVote(userId, castVoteDTO.ElectionId, castVoteDTO.CandidateId)
+}
+
+func (service *electionService) GetElectionResults(userId string, role int, electionId string) (dto.GeneralElectionResultsDTO, error) {
+	election, candidates, err := service.database.GetResults(userId, role, electionId)
+	if err != nil {
+		return dto.GeneralElectionResultsDTO{}, err
+	}
+
+	var candidateResultsDTOs []dto.CandidateResultsDTO
+	for _, candidate := range candidates {
+		candidateResultsDTOs = append(candidateResultsDTOs, mappers.ToCandidateResultsDTOFromCandidate(candidate))
+	}
+
+	if role == 1 || role == 2 {
+		generalParticipantDTOs, err := service.database.GetElectionParticipants(userId, electionId)
+		if err != nil {
+			return dto.GeneralElectionResultsDTO{}, err
+		}
+
+		return mappers.ToGeneralElectionResultsDTOForAdmins(election, generalParticipantDTOs, candidateResultsDTOs), nil
+	} else if role == 0 {
+		return mappers.ToGeneralElectionResultsDTOForStudents(election, candidateResultsDTOs), nil
+	}
+
+	log.Println("Invalid role!")
+	return dto.GeneralElectionResultsDTO{}, errors.New("Invalid role!")
 }

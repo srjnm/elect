@@ -115,6 +115,10 @@ func main() {
 	apiRoutes.POST("/candidate/approve/:id", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.ApproveCandidateHandler)
 	//Unapprove Candidate
 	apiRoutes.POST("/candidate/unapprove/:id", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.UnapproveCandidateHandler)
+	//Cast Vote
+	apiRoutes.POST("/vote", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.CastVoteHandler)
+	//Get Election Results
+	apiRoutes.GET("/results/:id", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.GetElectionResultsHandler)
 
 	//Swagger Endpoint Integration
 	server.GET("/docs", middlewares.Authorizer(jwtService, authEnforcer), func(cxt *gin.Context) {
