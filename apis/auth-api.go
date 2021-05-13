@@ -209,3 +209,128 @@ func (auth *AuthAPI) OTPHandler(cxt *gin.Context) {
 		return
 	}
 }
+
+// ChangePassword godoc
+// @Summary Change your password
+// @Tags auth
+// @Produce json
+// @Param changePassword body dto.ChangePasswordDTO true "Change Password"
+// @Success 200 {object} dto.Response
+// @Failure 401 {object} dto.Response
+// @Failure 400 {object} dto.Response
+// @Router /changepassword [post]
+func (auth *AuthAPI) ChangePasswordHandler(cxt *gin.Context) {
+	err := auth.userController.ChangePassword(cxt)
+
+	if err != nil {
+		cxt.JSON(http.StatusBadRequest, dto.Response{
+			Message: err.Error(),
+		})
+		return
+	} else {
+		cxt.JSON(http.StatusOK, dto.Response{
+			Message: "Password Changed",
+		})
+		return
+	}
+}
+
+// CheckVerifyTokenValidity godoc
+// @Summary Check if verify token is valid or not
+// @Tags auth
+// @Produce json
+// @Param token path string true "Verify Token"
+// @Success 200 {object} dto.Response
+// @Failure 401 {object} dto.Response
+// @Failure 400 {object} dto.Response
+// @Router /verifytoken/{token} [post]
+func (auth *AuthAPI) CheckVerifyTokenValidityHandler(cxt *gin.Context) {
+	err := auth.userController.CheckVerifyTokenValidity(cxt)
+
+	if err != nil {
+		cxt.JSON(http.StatusBadRequest, dto.Response{
+			Message: err.Error(),
+		})
+		return
+	} else {
+		cxt.JSON(http.StatusOK, dto.Response{
+			Message: "Valid Verify Token",
+		})
+		return
+	}
+}
+
+// CheckResetTokenValidity godoc
+// @Summary Check if reset token is valid or not
+// @Tags auth
+// @Produce json
+// @Param token path string true "Reset Token"
+// @Success 200 {object} dto.Response
+// @Failure 401 {object} dto.Response
+// @Failure 400 {object} dto.Response
+// @Router /resettoken/{token} [post]
+func (auth *AuthAPI) CheckResetTokenValidityHandler(cxt *gin.Context) {
+	err := auth.userController.CheckResetTokenValidity(cxt)
+
+	if err != nil {
+		cxt.JSON(http.StatusBadRequest, dto.Response{
+			Message: err.Error(),
+		})
+		return
+	} else {
+		cxt.JSON(http.StatusOK, dto.Response{
+			Message: "Valid Reset Token",
+		})
+		return
+	}
+}
+
+// CreateResetToken godoc
+// @Summary Create a reset token and send email to reset password
+// @Tags auth
+// @Produce json
+// @Param createResetToken body dto.CreateResetTokenDTO true "Email"
+// @Success 200 {object} dto.Response
+// @Failure 401 {object} dto.Response
+// @Failure 400 {object} dto.Response
+// @Router /createresettoken [post]
+func (auth *AuthAPI) CreateResetTokenHandler(cxt *gin.Context) {
+	err := auth.userController.GenerateResetToken(cxt)
+
+	if err != nil {
+		cxt.JSON(http.StatusBadRequest, dto.Response{
+			Message: err.Error(),
+		})
+		return
+	} else {
+		cxt.JSON(http.StatusOK, dto.Response{
+			Message: "Reset token created and email sent",
+		})
+		return
+	}
+}
+
+// ResetPassword godoc
+// @Summary Reset password if you have a valid token
+// @Tags auth
+// @Produce json
+// @Param createResetToken body dto.ResetPasswordDTO true "Reset Password"
+// @Success 200 {object} dto.Response
+// @Failure 401 {object} dto.Response
+// @Failure 400 {object} dto.Response
+// @Router /resetpassword [post]
+func (auth *AuthAPI) ResetPasswordHandler(cxt *gin.Context) {
+	err := auth.userController.ResetPassword(cxt)
+
+	if err != nil {
+		cxt.JSON(http.StatusBadRequest, dto.Response{
+			Message: err.Error(),
+		})
+		return
+	} else {
+		cxt.JSON(http.StatusOK, dto.Response{
+			Message: "Password Reset",
+		})
+		return
+	}
+}

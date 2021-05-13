@@ -23,6 +23,16 @@ definitions:
     - candidate_id
     - election_id
     type: object
+  dto.ChangePasswordDTO:
+    properties:
+      current_password:
+        type: string
+      new_password:
+        type: string
+    required:
+    - current_password
+    - new_password
+    type: object
   dto.CreateElectionDTO:
     properties:
       ending_at:
@@ -40,6 +50,13 @@ definitions:
     - locking_at
     - starting_at
     - title
+    type: object
+  dto.CreateResetTokenDTO:
+    properties:
+      email:
+        type: string
+    required:
+    - email
     type: object
   dto.DeleteParticipantDTO:
     properties:
@@ -211,6 +228,16 @@ definitions:
         type: string
       user_id:
         type: string
+    type: object
+  dto.ResetPasswordDTO:
+    properties:
+      new_password:
+        type: string
+      token:
+        type: string
+    required:
+    - new_password
+    - token
     type: object
   dto.Response:
     properties:
@@ -677,6 +704,60 @@ paths:
       summary: Cast vote to the candidate of the election you are part of
       tags:
       - participant
+  /changepassword:
+    post:
+      parameters:
+      - description: Change Password
+        in: body
+        name: changePassword
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ChangePasswordDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Change your password
+      tags:
+      - auth
+  /createresettoken:
+    post:
+      parameters:
+      - description: Email
+        in: body
+        name: createResetToken
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateResetTokenDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Create a reset token and send email to reset password
+      tags:
+      - auth
   /login:
     post:
       parameters:
@@ -773,6 +854,59 @@ paths:
       summary: Refresh Token
       tags:
       - auth
+  /resetpassword:
+    post:
+      parameters:
+      - description: Reset Password
+        in: body
+        name: createResetToken
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ResetPasswordDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Reset password if you have a valid token
+      tags:
+      - auth
+  /resettoken/{token}:
+    post:
+      parameters:
+      - description: Reset Token
+        in: path
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Check if reset token is valid or not
+      tags:
+      - auth
   /setpassword:
     post:
       parameters:
@@ -798,6 +932,32 @@ paths:
           schema:
             $ref: '#/definitions/dto.Response'
       summary: Verify Email and Set Password
+      tags:
+      - auth
+  /verifytoken/{token}:
+    post:
+      parameters:
+      - description: Verify Token
+        in: path
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Check if verify token is valid or not
       tags:
       - auth
 swagger: "2.0"

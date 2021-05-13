@@ -6,8 +6,10 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"sync"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 )
 
 type ElectionAPI struct {
@@ -19,6 +21,9 @@ func NewElectionAPI(electionController controllers.ElectionController) *Election
 		electionController: electionController,
 	}
 }
+
+var update = make(chan []byte, 1)
+var wg sync.WaitGroup
 
 // CreateElection godoc
 // @Summary Create Election if you are an Admin
@@ -40,6 +45,8 @@ func (election *ElectionAPI) CreateElectionHandler(cxt *gin.Context) {
 		return
 	}
 
+	update <- []byte("update")
+	wg.Done()
 	cxt.JSON(http.StatusOK, dto.Response{
 		Message: "Created Election.",
 	})
@@ -65,6 +72,8 @@ func (election *ElectionAPI) EditElectionHandler(cxt *gin.Context) {
 		return
 	}
 
+	update <- []byte("update")
+	wg.Done()
 	cxt.JSON(http.StatusOK, dto.Response{
 		Message: "Election edited.",
 	})
@@ -90,6 +99,8 @@ func (election *ElectionAPI) DeleteElectionHandler(cxt *gin.Context) {
 		return
 	}
 
+	update <- []byte("update")
+	wg.Done()
 	cxt.JSON(http.StatusOK, dto.Response{
 		Message: "Election deleted.",
 	})
@@ -315,4 +326,28 @@ func (election *ElectionAPI) GetElectionResultsHandler(cxt *gin.Context) {
 
 	cxt.JSON(http.StatusOK, generalElectionResultsDTO)
 	return
+}
+
+func (election *ElectionAPI) ElectionUpdatesHandler(cxt *gin.Context) {
+	electionWS(cxt.Writer, cxt.Request)
+}
+
+var wsUpgrader = websocket.Upgrader{}
+
+func electionWS(w http.ResponseWriter, r *http.Request) {
+	conn, err := wsUpgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println("Failed to upgrade the connection: " + err.Error())
+		return
+	}
+
+	for {
+		wg.Add(1)
+		u := <-update
+		wg.Wait()
+		conn.WriteMessage(1, u)
+		if err != nil {
+			log.Println(err.Error())
+		}
+	}
 }

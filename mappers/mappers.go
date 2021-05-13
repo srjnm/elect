@@ -59,9 +59,9 @@ func ToElectionFromCreateElectionDTO(electionDTO dto.CreateElectionDTO) models.E
 	sT := strings.SplitAfter(electionDTO.StartingAt, "(")[0]
 	sTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", sT[:len(sT)-2])
 	eT := strings.SplitAfter(electionDTO.EndingAt, "(")[0]
-	eTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", eT[:len(sT)-2])
+	eTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", eT[:len(eT)-2])
 	lT := strings.SplitAfter(electionDTO.LockingAt, "(")[0]
-	lTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", lT[:len(sT)-2])
+	lTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", lT[:len(lT)-2])
 	return models.Election{
 		Title:          electionDTO.Title,
 		StartingAt:     sTime,
@@ -72,18 +72,31 @@ func ToElectionFromCreateElectionDTO(electionDTO dto.CreateElectionDTO) models.E
 }
 
 func ToElectionFromEditElectionDTO(editElectionDTO dto.EditElectionDTO) models.Election {
-	sT := strings.SplitAfter(editElectionDTO.StartingAt, "(")[0]
-	sTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", sT[:len(sT)-2])
-	eT := strings.SplitAfter(editElectionDTO.EndingAt, "(")[0]
-	eTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", eT[:len(sT)-2])
-	lT := strings.SplitAfter(editElectionDTO.LockingAt, "(")[0]
-	lTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", lT[:len(sT)-2])
+	var sTime, eTime, lTime time.Time
+	if editElectionDTO.StartingAt != "" {
+		sT := strings.SplitAfter(editElectionDTO.StartingAt, "(")[0]
+		sTime, _ = time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", sT[:len(sT)-2])
+		sTime = sTime.UTC()
+	}
+
+	if editElectionDTO.EndingAt != "" {
+		eT := strings.SplitAfter(editElectionDTO.EndingAt, "(")[0]
+		eTime, _ = time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", eT[:len(eT)-2])
+		eTime = eTime.UTC()
+	}
+
+	if editElectionDTO.LockingAt != "" {
+		lT := strings.SplitAfter(editElectionDTO.LockingAt, "(")[0]
+		lTime, _ = time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", lT[:len(lT)-2])
+		lTime = lTime.UTC()
+	}
+
 	return models.Election{
 		ElectionID:     uuid.FromStringOrNil(editElectionDTO.ElectionId),
 		Title:          editElectionDTO.Title,
-		StartingAt:     sTime.UTC(),
-		EndingAt:       eTime.UTC(),
-		LockingAt:      lTime.UTC(),
+		StartingAt:     sTime,
+		EndingAt:       eTime,
+		LockingAt:      lTime,
 		GenderSpecific: editElectionDTO.GenderSpecific,
 	}
 }

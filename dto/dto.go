@@ -32,6 +32,20 @@ type OTPDTO struct {
 	OTP   string `json:"otp" binding:"required"`
 }
 
+type ChangePasswordDTO struct {
+	CurrentPassword string `json:"current_password" binding:"required"`
+	NewPassword     string `json:"new_password" binding:"required"`
+}
+
+type CreateResetTokenDTO struct {
+	Email string `json:"email" binding:"email,required"`
+}
+
+type ResetPasswordDTO struct {
+	Token       string `json:"token" binding:"required"`
+	NewPassword string `json:"new_password" binding:"required"`
+}
+
 // Register DTOs
 type RegisterStudentDTO struct {
 	Email        string `json:"email" binding:"email,required"`

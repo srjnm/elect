@@ -80,12 +80,22 @@ func main() {
 	server.POST("/refresh", middlewares.EnsureValidity(jwtService), authAPI.RefreshHandler)
 	//VerifyFrontEnd
 	server.GET("/verify/:token", middlewares.Authorizer(jwtService, authEnforcer), authAPI.VerifyGETHandler)
+	//Check Verify Token Validity
+	server.POST("/verifytoken/:token", middlewares.Authorizer(jwtService, authEnforcer), authAPI.CheckVerifyTokenValidityHandler)
 	//Verify Account
 	server.POST("/setpassword", middlewares.Authorizer(jwtService, authEnforcer), authAPI.VerifyHandler)
 	//OTP Verification FrontEnd
 	server.GET("/otp", middlewares.Authorizer(jwtService, authEnforcer), authAPI.OTPGETHandler)
 	//OTP Verification
 	server.POST("/otp", middlewares.Authorizer(jwtService, authEnforcer), authAPI.OTPHandler)
+	//Change Password
+	server.POST("/changepassword", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), authAPI.ChangePasswordHandler)
+	//Reset Password
+	server.POST("/resetpassword", middlewares.Authorizer(jwtService, authEnforcer), authAPI.ResetPasswordHandler)
+	//Create Reset Token
+	server.POST("/createresettoken", middlewares.Authorizer(jwtService, authEnforcer), authAPI.CreateResetTokenHandler)
+	//Check Reset Token Validity
+	server.POST("/resettoken/:token", middlewares.Authorizer(jwtService, authEnforcer), authAPI.CheckResetTokenValidityHandler)
 
 	apiRoutes := server.Group("/api")
 	//Register Students
@@ -119,6 +129,11 @@ func main() {
 	apiRoutes.POST("/vote", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.CastVoteHandler)
 	//Get Election Results
 	apiRoutes.GET("/results/:id", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.GetElectionResultsHandler)
+
+	//Elections Update WebSocket
+	apiRoutes.GET("/ws/election", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.ElectionUpdatesHandler)
+
+	server.GET("/ws", func(cxt *gin.Context) { cxt.HTML(http.StatusOK, "ws.html", nil) })
 
 	//Swagger Endpoint Integration
 	server.GET("/docs", middlewares.Authorizer(jwtService, authEnforcer), func(cxt *gin.Context) {

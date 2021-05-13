@@ -31,6 +31,10 @@ type Database interface {
 	StoreActiveRefreshToken(token string, email string) error
 	GetActiveRefreshToken(email string) (string, error)
 	ClearActiveRefreshToken(email string) error
+	ChangePassword(userId string, changePasswordDTO dto.ChangePasswordDTO) error
+	GenerateResetToken(email string) (string, string, error)
+	CheckResetTokenValidity(token string) error
+	ResetPassword(resetPasswordDTO dto.ResetPasswordDTO) error
 
 	// Users
 	RegisterStudent(user models.User) error
@@ -65,7 +69,7 @@ func SetUpQORAdmin(db *gorm.DB) *http.ServeMux {
 	usr := adm.AddResource(models.User{}, &admin.Config{Menu: []string{"User Management"}})
 	usr.IndexAttrs("-Password", "-VerifyToken", "-ActiveRefreshToken")
 	usr.NewAttrs("-Password", "-ActiveRefreshToken", "-RegisteredBy")
-	usr.EditAttrs("-VerifyToken", "-Email", "-ActiveRefreshToken", "-RegisteredBy")
+	usr.EditAttrs("-VerifyToken", "-ActiveRefreshToken", "-RegisteredBy")
 	usr.Meta(&admin.Meta{
 		Name: "Password",
 		Type: "password",

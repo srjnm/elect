@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -66,4 +67,11 @@ type Candidate struct {
 	IDProof        string    `gorm:"not null"`
 	Approved       bool      `gorm:"not null; default: false"`
 	Votes          int       `gorm:"not null; default: 0"`
+}
+
+type ResetToken struct {
+	gorm.Model
+	Email     string    `validate:"email,optional" gorm:"not null; type: varchar(384)"`
+	Token     string    `gorm:"not null; unique"`
+	ExpiresAt time.Time `gorm:"not null"`
 }

@@ -28,6 +28,11 @@ type UserController interface {
 	RegisterStudents(*gin.Context) (int, error)
 	RegisteredStudents(cxt *gin.Context) ([]dto.GeneralStudentDTO, error)
 	DeleteRegisteredStudent(cxt *gin.Context) error
+	ChangePassword(cxt *gin.Context) error
+	CheckVerifyTokenValidity(cxt *gin.Context) error
+	CheckResetTokenValidity(cxt *gin.Context) error
+	GenerateResetToken(cxt *gin.Context) error
+	ResetPassword(cxt *gin.Context) error
 }
 
 type userController struct {
@@ -449,6 +454,68 @@ func (controller *userController) DeleteRegisteredStudent(cxt *gin.Context) erro
 	}
 
 	return controller.userService.DeleteRegisteredStudent(userId, studentUserId)
+}
+
+func (controller *userController) ChangePassword(cxt *gin.Context) error {
+	var changePasswordDTO dto.ChangePasswordDTO
+	cxt.ShouldBindJSON(&changePasswordDTO)
+
+	cookie, err := cxt.Cookie("token")
+	if err != nil {
+		return err
+	}
+
+	var s = securecookie.New([]byte(os.Getenv("COOKIE_HASH_SECRET")), nil)
+	value := make(map[string]string)
+	err = s.Decode("tokens", cookie, &value)
+	if err != nil {
+		return err
+	}
+
+	userId, _, err := controller.jwtService.GetUserIDAndRole(value["access_token"])
+	if err != nil {
+		return err
+	}
+
+	return controller.userService.ChangePassword(userId, changePasswordDTO)
+}
+
+func (controller *userController) CheckVerifyTokenValidity(cxt *gin.Context) error {
+	token := cxt.Param("token")
+	if token == "" {
+		return errors.New("Invalid token!")
+	}
+
+	return controller.userService.CheckVerifyTokenValidity(token)
+}
+
+func (controller *userController) CheckResetTokenValidity(cxt *gin.Context) error {
+	token := cxt.Param("token")
+	if token == "" {
+		return errors.New("Invalid token!")
+	}
+
+	return controller.userService.CheckResetTokenValidity(token)
+}
+
+func (controller *userController) GenerateResetToken(cxt *gin.Context) error {
+	var createResetToken dto.CreateResetTokenDTO
+	err := cxt.ShouldBindJSON(&createResetToken)
+	if err != nil {
+		return err
+	}
+
+	return controller.userService.GenerateResetToken(createResetToken)
+}
+
+func (controller *userController) ResetPassword(cxt *gin.Context) error {
+	var resetPasswordDTO dto.ResetPasswordDTO
+	err := cxt.ShouldBindJSON(&resetPasswordDTO)
+	if err != nil {
+		return err
+	}
+
+	return controller.userService.ResetPassword(resetPasswordDTO)
 }
 
 //Bcrypt Functions

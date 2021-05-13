@@ -2,6 +2,10 @@ p, 2, *, *, allow
 p, *, /docs, GET, allow
 p, *, /swagger/*, GET, allow
 p, *, /setpassword, POST, allow
+p, *, /checktoken/*, POST, allow
+p, *, /resettoken/*, POST, allow
+p, *, /createresettoken, POST, allow
+p, *, /resetpassword, POST, allow
 p, -1, /verify/*, GET, allow
 p, -1, /login, POST, allow
 p, -2, /otp, POST, allow
@@ -14,12 +18,15 @@ p, 2, /otp, POST, deny
 p, 2, /otp, GET, deny
 p, 2, /api/candidate, POST, deny
 p, 0, /logout, POST, allow
+p, 0, /changepassword, POST, allow
 p, 0, /api/elections, GET, allow
 p, 0, /api/election/*, GET, allow
 p, 0, /api/candidate, POST, allow
 p, 0, /api/vote, POST, allow
 p, 0, /api/results/*, GET, allow
+p, 0, /api/ws/election, GET, allow
 p, 1, /logout, POST, allow
+p, 1, /changepassword, POST, allow
 p, 1, /api/registerstudents, POST, allow
 p, 1, /api/registeredstudents*, GET, allow
 p, 1, /api/registeredstudent/*, DELETE, allow
@@ -33,3 +40,4 @@ p, 1, /api/participant, DELETE, allow
 p, 1, /api/candidate/approve/*, POST, allow
 p, 1, /api/candidate/unapprove/*, POST, allow
 p, 1, /api/results/*, GET, allow
+p, 1, /api/ws/election, GET, allow
