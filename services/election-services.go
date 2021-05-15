@@ -43,6 +43,13 @@ func (service *electionService) CreateElection(userId string, createElectionDTO 
 	election := mappers.ToElectionFromCreateElectionDTO(createElectionDTO)
 	election.CreatedBy = userId
 
+	if election.LockingAt.After(election.StartingAt) {
+		return errors.New("Locking At is after Starting At!")
+	}
+	if election.StartingAt.After(election.EndingAt) {
+		return errors.New("Starting At is after Ending At!")
+	}
+
 	err := service.database.CreateElection(election)
 	if err != nil {
 		return err
@@ -52,7 +59,16 @@ func (service *electionService) CreateElection(userId string, createElectionDTO 
 }
 
 func (service *electionService) EditElection(userId string, editElectionDTO dto.EditElectionDTO) error {
-	return service.database.EditElection(userId, mappers.ToElectionFromEditElectionDTO(editElectionDTO))
+	election := mappers.ToElectionFromEditElectionDTO(editElectionDTO)
+
+	if election.LockingAt.After(election.StartingAt) {
+		return errors.New("Locking At is after Starting At!")
+	}
+	if election.StartingAt.After(election.EndingAt) {
+		return errors.New("Starting At is after Ending At!")
+	}
+
+	return service.database.EditElection(userId, election)
 }
 
 func (service *electionService) DeleteElection(userId string, electionId string) error {

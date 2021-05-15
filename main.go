@@ -133,8 +133,6 @@ func main() {
 	//Elections Update WebSocket
 	apiRoutes.GET("/ws/election", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.ElectionUpdatesHandler)
 
-	server.GET("/ws", func(cxt *gin.Context) { cxt.HTML(http.StatusOK, "ws.html", nil) })
-
 	//Swagger Endpoint Integration
 	server.GET("/docs", middlewares.Authorizer(jwtService, authEnforcer), func(cxt *gin.Context) {
 		cxt.Redirect(http.StatusPermanentRedirect, "/swagger/index.html")

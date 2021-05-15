@@ -511,7 +511,7 @@ func (db *postgresDatabase) GetElectionForStudents(userId string, electionId str
 	}
 
 	var candidates []models.Candidate
-	res = db.connection.Model(&models.Candidate{}).Where("election_id = ?", electionId).Find(&candidates)
+	res = db.connection.Model(&models.Candidate{}).Where("election_id = ? AND approved = ?", electionId, true).Find(&candidates)
 	if res.Error != nil {
 		log.Println(res.Error.Error())
 		return models.Election{}, nil, res.Error
@@ -571,6 +571,10 @@ func (db *postgresDatabase) CastVote(userId string, electionId string, candidate
 	if res.Error != nil {
 		log.Println(res.Error.Error())
 		return res.Error
+	}
+
+	if candidate.Approved == false {
+		return errors.New("Unapproved candidate!")
 	}
 
 	participant.Voted = true

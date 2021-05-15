@@ -3,10 +3,10 @@ package apis
 import (
 	"elect/controllers"
 	"elect/dto"
+	"errors"
 	"log"
 	"net/http"
 	"strconv"
-	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -23,7 +23,6 @@ func NewElectionAPI(electionController controllers.ElectionController) *Election
 }
 
 var update = make(chan []byte, 1)
-var wg sync.WaitGroup
 
 // CreateElection godoc
 // @Summary Create Election if you are an Admin
@@ -46,7 +45,6 @@ func (election *ElectionAPI) CreateElectionHandler(cxt *gin.Context) {
 	}
 
 	update <- []byte("update")
-	wg.Done()
 	cxt.JSON(http.StatusOK, dto.Response{
 		Message: "Created Election.",
 	})
@@ -73,7 +71,6 @@ func (election *ElectionAPI) EditElectionHandler(cxt *gin.Context) {
 	}
 
 	update <- []byte("update")
-	wg.Done()
 	cxt.JSON(http.StatusOK, dto.Response{
 		Message: "Election edited.",
 	})
@@ -100,7 +97,6 @@ func (election *ElectionAPI) DeleteElectionHandler(cxt *gin.Context) {
 	}
 
 	update <- []byte("update")
-	wg.Done()
 	cxt.JSON(http.StatusOK, dto.Response{
 		Message: "Election deleted.",
 	})
@@ -332,22 +328,84 @@ func (election *ElectionAPI) ElectionUpdatesHandler(cxt *gin.Context) {
 	electionWS(cxt.Writer, cxt.Request)
 }
 
-var wsUpgrader = websocket.Upgrader{}
+var connections = make(map[*websocket.Conn]bool)
 
 func electionWS(w http.ResponseWriter, r *http.Request) {
+	var wsUpgrader = websocket.Upgrader{
+		CheckOrigin: func(r *http.Request) bool {
+			origin := r.Header.Get("Origin")
+			return contains([]string{"http://localhost:8000", "http://localhost:3000", "http://localhost:8080", "https://e1ect.herokuapp.com/", "http://192.168.1.248:3000"}, origin)
+		},
+	}
 	conn, err := wsUpgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println("Failed to upgrade the connection: " + err.Error())
 		return
 	}
 
-	for {
-		wg.Add(1)
-		u := <-update
-		wg.Wait()
-		conn.WriteMessage(1, u)
-		if err != nil {
-			log.Println(err.Error())
+	connections[conn] = true
+
+	go func() {
+		for {
+			err := readFromConnections()
+			if err != nil {
+				break
+			}
 		}
+		return
+	}()
+
+	go func() {
+		for {
+			u := <-update
+			err := writeToConnections(u)
+			if err != nil {
+				break
+			}
+		}
+		return
+	}()
+
+}
+
+func contains(s []string, str string) bool {
+	for _, v := range s {
+		if v == str {
+			return true
+		}
+	}
+
+	return false
+}
+
+func writeToConnections(msg []byte) error {
+	if len(connections) == 0 || connections == nil {
+		return errors.New("No connections!")
+	} else {
+		for index := range connections {
+			err := index.WriteMessage(1, msg)
+			if err != nil {
+				index.Close()
+				delete(connections, index)
+				return nil
+			}
+		}
+		return nil
+	}
+}
+
+func readFromConnections() error {
+	if len(connections) == 0 || connections == nil {
+		return errors.New("No connections!")
+	} else {
+		for index := range connections {
+			_, _, err := index.ReadMessage()
+			if err != nil {
+				index.Close()
+				delete(connections, index)
+				return nil
+			}
+		}
+		return nil
 	}
 }
