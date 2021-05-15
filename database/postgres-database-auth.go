@@ -5,8 +5,10 @@ import (
 	"elect/mappers"
 	"elect/models"
 	"errors"
+	"time"
 
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -128,6 +130,133 @@ func (db *postgresDatabase) ClearActiveRefreshToken(email string) error {
 	var user models.User
 
 	res := db.connection.Model(&user).Where("email = ?", email).Update("active_refresh_token", "")
+	if res.Error != nil {
+		return res.Error
+	}
+
+	return nil
+}
+
+func (db *postgresDatabase) ChangePassword(userId string, changePasswordDTO dto.ChangePasswordDTO) error {
+	var user models.User
+	res := db.connection.Model(&models.User{}).Where("user_id = ?", userId).Find(&user)
+	if res.Error != nil {
+		return res.Error
+	}
+
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(changePasswordDTO.CurrentPassword))
+	if err != nil {
+		return errors.New("Invalid Current Password!")
+	}
+
+	newPassword, err := HashPassword(changePasswordDTO.NewPassword)
+	if err != nil {
+		return errors.New("Failed to hash password!")
+	}
+
+	user.Password = newPassword
+
+	res = db.connection.Model(&models.User{}).Where("user_id = ?", userId).Update(&user)
+	if res.Error != nil {
+		return res.Error
+	}
+
+	return nil
+}
+
+func (db *postgresDatabase) GenerateResetToken(email string) (string, string, error) {
+	var count int
+	res := db.connection.Model(&models.User{}).Where("email = ?", email).Count(&count)
+	if res.Error != nil {
+		return "", "", res.Error
+	}
+	if count == 0 {
+		return "", "", errors.New("Invalid email!")
+	}
+
+	var user models.User
+	res = db.connection.Model(&models.User{}).Where("email = ?", email).Find(&user)
+	if res.Error != nil {
+		return "", "", res.Error
+	}
+	if !user.Verified {
+		return "", "", errors.New("Account not verified yet!")
+	}
+
+	token := uuid.NewV4().String()
+	expiresAt := time.Now().Add(time.Minute * 30).UTC()
+
+	res = db.connection.Model(&models.ResetToken{}).Create(&models.ResetToken{Email: email, Token: token, ExpiresAt: expiresAt})
+	if res.Error != nil {
+		return "", "", res.Error
+	}
+
+	return user.FirstName, token, nil
+}
+
+func (db *postgresDatabase) CheckResetTokenValidity(token string) error {
+	var count int
+	res := db.connection.Model(&models.ResetToken{}).Where("token = ?", token).Count(&count)
+	if res.Error != nil {
+		return res.Error
+	}
+	if count == 0 {
+		return errors.New("Invalid Reset Token!")
+	}
+
+	var resetToken models.ResetToken
+	res = db.connection.Model(&models.ResetToken{}).Where("token = ?", token).Find(&resetToken)
+	if res.Error != nil {
+		return res.Error
+	}
+
+	if time.Now().UTC().After(resetToken.ExpiresAt) {
+		return errors.New("Reset Token Expired!")
+	}
+
+	return nil
+}
+
+func (db *postgresDatabase) ResetPassword(resetPasswordDTO dto.ResetPasswordDTO) error {
+	var count int
+	res := db.connection.Model(&models.ResetToken{}).Where("token = ?", resetPasswordDTO.Token).Count(&count)
+	if res.Error != nil {
+		return res.Error
+	}
+	if count == 0 {
+		return errors.New("Invalid Reset Token!")
+	}
+
+	var resetToken models.ResetToken
+	res = db.connection.Model(&models.ResetToken{}).Where("token = ?", resetPasswordDTO.Token).Find(&resetToken)
+	if res.Error != nil {
+		return res.Error
+	}
+
+	if time.Now().UTC().After(resetToken.ExpiresAt) {
+		return errors.New("Reset Token Expired!")
+	}
+
+	var user models.User
+	res = db.connection.Model(&models.User{}).Where("email = ?", resetToken.Email).Find(&user)
+	if res.Error != nil {
+		return res.Error
+	}
+
+	newPassword, err := HashPassword(resetPasswordDTO.NewPassword)
+	if err != nil {
+		return errors.New("Failed to hash password!")
+	}
+
+	user.Password = newPassword
+
+	res = db.connection.Model(&models.User{}).Update(&user)
+	if res.Error != nil {
+		return res.Error
+	}
+
+	resetToken.ExpiresAt = time.Now().UTC()
+	res = db.connection.Model(&models.ResetToken{}).Update(&resetToken)
 	if res.Error != nil {
 		return res.Error
 	}

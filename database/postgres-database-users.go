@@ -26,9 +26,6 @@ func (db *postgresDatabase) RegisteredStudents(userId string, paginatorParams dt
 		if res.Error != nil {
 			return nil, res.Error
 		}
-		if len(regStudents) == 0 {
-			return nil, errors.New("No students registered!")
-		}
 
 		return regStudents, nil
 	}

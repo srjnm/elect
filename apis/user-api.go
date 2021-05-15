@@ -68,3 +68,26 @@ func (user *UserAPI) RegisteredStudentsHandler(cxt *gin.Context) {
 	cxt.JSON(http.StatusOK, registeredStudents)
 	return
 }
+
+// DeleteRegisteredStudent godoc
+// @Summary Delete the student you have registered
+// @Tags user
+// @Produce json
+// @Param id path string true "Student ID"
+// @Success 200 {object} dto.Response
+// @Failure 401 {object} dto.Response
+// @Failure 400 {object} dto.Response
+// @Router /api/registeredstudent/{id} [delete]
+func (user *UserAPI) DeleteRegisteredStudentHandler(cxt *gin.Context) {
+	err := user.userController.DeleteRegisteredStudent(cxt)
+	if err != nil {
+		cxt.JSON(http.StatusBadRequest, dto.Response{
+			Message: err.Error(),
+		})
+		return
+	}
+
+	cxt.JSON(http.StatusOK, dto.Response{
+		Message: "Deleted Successfully",
+	})
+}

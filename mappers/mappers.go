@@ -3,6 +3,10 @@ package mappers
 import (
 	"elect/dto"
 	"elect/models"
+	"strings"
+	"time"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 func ToAuthUserDTO(user models.User) dto.AuthUserDTO {
@@ -43,9 +47,160 @@ func ToUserFromRegisterStudentDTO(registerStudentDTO dto.RegisterStudentDTO) mod
 
 func ToGeneralStudentDTOFromUser(user models.User) dto.GeneralStudentDTO {
 	return dto.GeneralStudentDTO{
+		UserID:         user.UserID.String(),
 		Email:          user.Email,
 		FirstName:      user.FirstName,
 		LastName:       user.LastName,
 		RegisterNumber: user.RegNumber,
+	}
+}
+
+func ToElectionFromCreateElectionDTO(electionDTO dto.CreateElectionDTO) models.Election {
+	sT := strings.SplitAfter(electionDTO.StartingAt, "(")[0]
+	sTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", sT[:len(sT)-2])
+	eT := strings.SplitAfter(electionDTO.EndingAt, "(")[0]
+	eTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", eT[:len(eT)-2])
+	lT := strings.SplitAfter(electionDTO.LockingAt, "(")[0]
+	lTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", lT[:len(lT)-2])
+	return models.Election{
+		Title:          electionDTO.Title,
+		StartingAt:     sTime,
+		EndingAt:       eTime,
+		LockingAt:      lTime,
+		GenderSpecific: electionDTO.GenderSpecific,
+	}
+}
+
+func ToElectionFromEditElectionDTO(editElectionDTO dto.EditElectionDTO) models.Election {
+	var sTime, eTime, lTime time.Time
+	if editElectionDTO.StartingAt != "" {
+		sT := strings.SplitAfter(editElectionDTO.StartingAt, "(")[0]
+		sTime, _ = time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", sT[:len(sT)-2])
+		sTime = sTime.UTC()
+	}
+
+	if editElectionDTO.EndingAt != "" {
+		eT := strings.SplitAfter(editElectionDTO.EndingAt, "(")[0]
+		eTime, _ = time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", eT[:len(eT)-2])
+		eTime = eTime.UTC()
+	}
+
+	if editElectionDTO.LockingAt != "" {
+		lT := strings.SplitAfter(editElectionDTO.LockingAt, "(")[0]
+		lTime, _ = time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", lT[:len(lT)-2])
+		lTime = lTime.UTC()
+	}
+
+	return models.Election{
+		ElectionID:     uuid.FromStringOrNil(editElectionDTO.ElectionId),
+		Title:          editElectionDTO.Title,
+		StartingAt:     sTime,
+		EndingAt:       eTime,
+		LockingAt:      lTime,
+		GenderSpecific: editElectionDTO.GenderSpecific,
+	}
+}
+
+func ToGeneralElectionDTOFromElection(election models.Election) dto.GeneralElectionDTO {
+	return dto.GeneralElectionDTO{
+		ElectionID:     election.ElectionID.String(),
+		Title:          election.Title,
+		StartingAt:     election.StartingAt.String(),
+		EndingAt:       election.EndingAt.String(),
+		LockingAt:      election.LockingAt.String(),
+		GenderSpecific: election.GenderSpecific,
+	}
+}
+
+func ToCandidateFromCreateCandidateDTO(createCandidateDTO dto.CreateCandidateDTO) models.Candidate {
+	return models.Candidate{
+		ElectionID:     uuid.FromStringOrNil(createCandidateDTO.ElectionId),
+		Sex:            createCandidateDTO.Sex,
+		DisplayPicture: createCandidateDTO.DisplayPicture,
+		Poster:         createCandidateDTO.Poster,
+		IDProof:        createCandidateDTO.IdProof,
+	}
+}
+
+func ToGeneralParticipantDTOFromUser(participantId string, user models.User) dto.GeneralParticipantDTO {
+	return dto.GeneralParticipantDTO{
+		ParticipantID: participantId,
+		UserID:        user.UserID.String(),
+		RegNumber:     user.RegNumber,
+		FirstName:     user.FirstName,
+		LastName:      user.LastName,
+	}
+}
+
+func ToGeneralCandidateDTOFromCandidate(candidate models.Candidate) dto.GeneralCandidateDTO {
+	return dto.GeneralCandidateDTO{
+		CandidateID:    candidate.CandidateID.String(),
+		UserID:         candidate.UserID.String(),
+		ElectionID:     candidate.ElectionID.String(),
+		Sex:            candidate.Sex,
+		DisplayPicture: candidate.DisplayPicture,
+		Poster:         candidate.Poster,
+		IDProof:        candidate.IDProof,
+		Approved:       candidate.Approved,
+	}
+}
+
+func ToGeneralElectionDTOForAdmins(election models.Election, generalParticipantDTOs []dto.GeneralParticipantDTO, generalCandidateDTOs []dto.GeneralCandidateDTO) dto.GeneralElectionDTO {
+	return dto.GeneralElectionDTO{
+		ElectionID:     election.ElectionID.String(),
+		Title:          election.Title,
+		StartingAt:     election.StartingAt.String(),
+		EndingAt:       election.EndingAt.String(),
+		LockingAt:      election.LockingAt.String(),
+		GenderSpecific: election.GenderSpecific,
+		Participants:   generalParticipantDTOs,
+		Candidates:     generalCandidateDTOs,
+	}
+}
+
+func ToGeneralElectionDTOForStudents(election models.Election, generalCandidateDTOs []dto.GeneralCandidateDTO) dto.GeneralElectionDTO {
+	return dto.GeneralElectionDTO{
+		ElectionID:     election.ElectionID.String(),
+		Title:          election.Title,
+		StartingAt:     election.StartingAt.String(),
+		EndingAt:       election.EndingAt.String(),
+		LockingAt:      election.LockingAt.String(),
+		GenderSpecific: election.GenderSpecific,
+		Candidates:     generalCandidateDTOs,
+	}
+}
+
+func ToGeneralElectionResultsDTOForAdmins(election models.Election, generalParticipantDTOs []dto.GeneralParticipantDTO, candidateResultsDTOs []dto.CandidateResultsDTO) dto.GeneralElectionResultsDTO {
+	return dto.GeneralElectionResultsDTO{
+		ElectionID:       election.ElectionID.String(),
+		Title:            election.Title,
+		StartingAt:       election.StartingAt.String(),
+		EndingAt:         election.EndingAt.String(),
+		LockingAt:        election.LockingAt.String(),
+		GenderSpecific:   election.GenderSpecific,
+		Participants:     generalParticipantDTOs,
+		CandidateResults: candidateResultsDTOs,
+	}
+}
+
+func ToGeneralElectionResultsDTOForStudents(election models.Election, candidateResultsDTOs []dto.CandidateResultsDTO) dto.GeneralElectionResultsDTO {
+	return dto.GeneralElectionResultsDTO{
+		ElectionID:       election.ElectionID.String(),
+		Title:            election.Title,
+		StartingAt:       election.StartingAt.String(),
+		EndingAt:         election.EndingAt.String(),
+		LockingAt:        election.LockingAt.String(),
+		GenderSpecific:   election.GenderSpecific,
+		CandidateResults: candidateResultsDTOs,
+	}
+}
+
+func ToCandidateResultsDTOFromCandidate(candidate models.Candidate) dto.CandidateResultsDTO {
+	return dto.CandidateResultsDTO{
+		CandidateID:    candidate.CandidateID.String(),
+		UserID:         candidate.UserID.String(),
+		Sex:            candidate.Sex,
+		ElectionID:     candidate.ElectionID.String(),
+		DisplayPicture: candidate.DisplayPicture,
 	}
 }

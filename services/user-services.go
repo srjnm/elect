@@ -21,9 +21,15 @@ type UserService interface {
 	TokenValidity(token string) error
 	RegisterStudent(registerStudentDTO dto.RegisterStudentDTO) error
 	RegisteredStudents(userId string, paginatorParams dto.PaginatorParams) ([]dto.GeneralStudentDTO, error)
+	DeleteRegisteredStudent(userId string, studentUserId string) error
 	SetActiveRefreshToken(token string, email string) error
 	CheckIfActiveRefreshToken(token string, email string) error
 	ClearActiveRefreshToken(email string) error
+	ChangePassword(userId string, changePasswordDTO dto.ChangePasswordDTO) error
+	CheckVerifyTokenValidity(token string) error
+	CheckResetTokenValidity(token string) error
+	GenerateResetToken(createResetTokenDTO dto.CreateResetTokenDTO) error
+	ResetPassword(resetPasswordDTO dto.ResetPasswordDTO) error
 }
 
 type userService struct {
@@ -130,4 +136,36 @@ func (service *userService) RegisteredStudents(userId string, paginatorParams dt
 	return generalStudentsDTO, nil
 }
 
-// func (service *userService) DeleteRegisteredStudent(userId string, ) error
+func (service *userService) DeleteRegisteredStudent(userId string, studentUserId string) error {
+	return service.database.DeleteRegisteredStudent(userId, studentUserId)
+}
+
+func (service *userService) ChangePassword(userId string, changePasswordDTO dto.ChangePasswordDTO) error {
+	return service.database.ChangePassword(userId, changePasswordDTO)
+}
+
+func (service *userService) CheckVerifyTokenValidity(token string) error {
+	return service.database.TokenValidity(token)
+}
+
+func (service *userService) CheckResetTokenValidity(token string) error {
+	return service.database.CheckResetTokenValidity(token)
+}
+
+func (service *userService) GenerateResetToken(createResetTokenDTO dto.CreateResetTokenDTO) error {
+	name, token, err := service.database.GenerateResetToken(createResetTokenDTO.Email)
+	if err != nil {
+		return err
+	}
+
+	err = email.SendResetPasswordEmail(name, createResetTokenDTO.Email, token, "reset.html")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (service *userService) ResetPassword(resetPasswordDTO dto.ResetPasswordDTO) error {
+	return service.database.ResetPassword(resetPasswordDTO)
+}

@@ -1,5 +1,183 @@
 basePath: /
 definitions:
+  dto.CandidateResultsDTO:
+    properties:
+      candidate_id:
+        type: string
+      display_picture:
+        type: string
+      election_id:
+        type: string
+      sex:
+        type: integer
+      user_id:
+        type: string
+    type: object
+  dto.CastVoteDTO:
+    properties:
+      candidate_id:
+        type: string
+      election_id:
+        type: string
+    required:
+    - candidate_id
+    - election_id
+    type: object
+  dto.ChangePasswordDTO:
+    properties:
+      current_password:
+        type: string
+      new_password:
+        type: string
+    required:
+    - current_password
+    - new_password
+    type: object
+  dto.CreateElectionDTO:
+    properties:
+      ending_at:
+        type: string
+      gender_specific:
+        type: boolean
+      locking_at:
+        type: string
+      starting_at:
+        type: string
+      title:
+        type: string
+    required:
+    - ending_at
+    - locking_at
+    - starting_at
+    - title
+    type: object
+  dto.CreateResetTokenDTO:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  dto.DeleteParticipantDTO:
+    properties:
+      election_id:
+        type: string
+      participant_id:
+        type: string
+    required:
+    - election_id
+    - participant_id
+    type: object
+  dto.EditElectionDTO:
+    properties:
+      election_id:
+        type: string
+      ending_at:
+        type: string
+      gender_specific:
+        type: boolean
+      locking_at:
+        type: string
+      starting_at:
+        type: string
+      title:
+        type: string
+    required:
+    - election_id
+    type: object
+  dto.Elections:
+    properties:
+      election_id:
+        type: string
+      ending_at:
+        type: string
+      gender_specific:
+        type: boolean
+      locking_at:
+        type: string
+      starting_at:
+        type: string
+      title:
+        type: string
+    type: object
+  dto.GeneralCandidateDTO:
+    properties:
+      approved:
+        type: boolean
+      candidate_id:
+        type: string
+      display_picture:
+        type: string
+      election_id:
+        type: string
+      id_proof:
+        type: string
+      poster:
+        type: string
+      sex:
+        type: integer
+      user_id:
+        type: string
+    type: object
+  dto.GeneralElectionDTO:
+    properties:
+      candidates:
+        items:
+          $ref: '#/definitions/dto.GeneralCandidateDTO'
+        type: array
+      election_id:
+        type: string
+      ending_at:
+        type: string
+      gender_specific:
+        type: boolean
+      locking_at:
+        type: string
+      participants:
+        items:
+          $ref: '#/definitions/dto.GeneralParticipantDTO'
+        type: array
+      starting_at:
+        type: string
+      title:
+        type: string
+    type: object
+  dto.GeneralElectionResultsDTO:
+    properties:
+      candidate_results:
+        items:
+          $ref: '#/definitions/dto.CandidateResultsDTO'
+        type: array
+      election_id:
+        type: string
+      ending_at:
+        type: string
+      gender_specific:
+        type: boolean
+      locking_at:
+        type: string
+      participants:
+        items:
+          $ref: '#/definitions/dto.GeneralParticipantDTO'
+        type: array
+      starting_at:
+        type: string
+      title:
+        type: string
+    type: object
+  dto.GeneralParticipantDTO:
+    properties:
+      first_name:
+        type: string
+      last_name:
+        type: string
+      participant_id:
+        type: string
+      register_number:
+        type: string
+      user_id:
+        type: string
+    type: object
   dto.GeneralStudentDTO:
     properties:
       email:
@@ -9,6 +187,8 @@ definitions:
       last_name:
         type: string
       reg_number:
+        type: string
+      user_id:
         type: string
     type: object
   dto.Login:
@@ -49,6 +229,16 @@ definitions:
       user_id:
         type: string
     type: object
+  dto.ResetPasswordDTO:
+    properties:
+      new_password:
+        type: string
+      token:
+        type: string
+    required:
+    - new_password
+    - token
+    type: object
   dto.Response:
     properties:
       message:
@@ -73,6 +263,329 @@ info:
   title: ELECT REST API
   version: "1.0"
 paths:
+  /api/candidate:
+    post:
+      parameters:
+      - in: formData
+        name: election_id
+        required: true
+        type: string
+      - in: formData
+        name: sex
+        required: true
+        type: integer
+      - description: Display Picture
+        in: formData
+        name: display_picture
+        required: true
+        type: file
+      - description: poster
+        in: formData
+        name: poster
+        required: true
+        type: file
+      - description: ID Proof
+        in: formData
+        name: id_proof
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Enroll as a candidate for the election you are part of
+      tags:
+      - candidate
+  /api/candidate/approve/{id}:
+    post:
+      parameters:
+      - description: Candidate ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Approve enrolled candidates to the election you created
+      tags:
+      - candidate
+  /api/candidate/unapprove/{id}:
+    post:
+      parameters:
+      - description: Candidate ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Unapprove enrolled candidates to the election you created
+      tags:
+      - candidate
+  /api/election:
+    post:
+      parameters:
+      - description: Election Details
+        in: body
+        name: election
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateElectionDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Create Election if you are an Admin
+      tags:
+      - election
+    put:
+      parameters:
+      - description: Edit Election
+        in: body
+        name: election
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EditElectionDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Edit the election you created
+      tags:
+      - election
+  /api/election/{id}:
+    delete:
+      parameters:
+      - description: Election ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Delete the election you created
+      tags:
+      - election
+    get:
+      parameters:
+      - description: Election ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GeneralElectionDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Get details of the election you created or you are part of
+      tags:
+      - election
+  /api/elections:
+    get:
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: string
+      - description: Order By - starting_at
+        in: query
+        name: orderby
+        type: string
+      - description: Order - asc or desc
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.Elections'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Get a list of election you are part of OR you have created
+      tags:
+      - election
+  /api/participant:
+    delete:
+      parameters:
+      - description: Delete Participant
+        in: body
+        name: participant
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DeleteParticipantDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Delete the participant of the election you created
+      tags:
+      - participant
+  /api/participants/{id}:
+    post:
+      parameters:
+      - description: Election ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Participants List
+        in: formData
+        name: participants
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Add participants to the election you created
+      tags:
+      - participant
+  /api/registeredstudent/{id}:
+    delete:
+      parameters:
+      - description: Student ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Delete the student you have registered
+      tags:
+      - user
   /api/registeredstudents:
     get:
       parameters:
@@ -138,6 +651,113 @@ paths:
       summary: Register Students if you are an Admin
       tags:
       - user
+  /api/results/{id}:
+    get:
+      parameters:
+      - description: Election ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GeneralElectionResultsDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Get the results of the election you were part of or you created
+      tags:
+      - election
+  /api/vote:
+    post:
+      parameters:
+      - description: Cast Vote
+        in: body
+        name: vote
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CastVoteDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Cast vote to the candidate of the election you are part of
+      tags:
+      - participant
+  /changepassword:
+    post:
+      parameters:
+      - description: Change Password
+        in: body
+        name: changePassword
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ChangePasswordDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Change your password
+      tags:
+      - auth
+  /createresettoken:
+    post:
+      parameters:
+      - description: Email
+        in: body
+        name: createResetToken
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateResetTokenDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Create a reset token and send email to reset password
+      tags:
+      - auth
   /login:
     post:
       parameters:
@@ -234,6 +854,59 @@ paths:
       summary: Refresh Token
       tags:
       - auth
+  /resetpassword:
+    post:
+      parameters:
+      - description: Reset Password
+        in: body
+        name: createResetToken
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ResetPasswordDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Reset password if you have a valid token
+      tags:
+      - auth
+  /resettoken/{token}:
+    post:
+      parameters:
+      - description: Reset Token
+        in: path
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Check if reset token is valid or not
+      tags:
+      - auth
   /setpassword:
     post:
       parameters:
@@ -259,6 +932,32 @@ paths:
           schema:
             $ref: '#/definitions/dto.Response'
       summary: Verify Email and Set Password
+      tags:
+      - auth
+  /verifytoken/{token}:
+    post:
+      parameters:
+      - description: Verify Token
+        in: path
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Check if verify token is valid or not
       tags:
       - auth
 swagger: "2.0"

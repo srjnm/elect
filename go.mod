@@ -1,11 +1,11 @@
 module elect
 
-
 // +heroku goVersion go1.15
 go 1.15
 
 require (
 	github.com/360EntSecGroup-Skylar/excelize/v2 v2.4.0
+	github.com/Azure/azure-storage-blob-go v0.13.0
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/aws/aws-sdk-go v1.38.25 // indirect
 	github.com/biezhi/gorm-paginator/pagination v0.0.0-20190124091837-7a5c8ed20334
@@ -15,6 +15,7 @@ require (
 	github.com/go-playground/validator/v10 v10.5.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/gorilla/securecookie v1.1.1
+	github.com/gorilla/websocket v1.4.2
 	github.com/hgfischer/go-otp v1.0.0
 	github.com/jinzhu/configor v1.2.1 // indirect
 	github.com/jinzhu/gorm v1.9.16
