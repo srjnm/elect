@@ -52,6 +52,7 @@ func ToGeneralStudentDTOFromUser(user models.User) dto.GeneralStudentDTO {
 		FirstName:      user.FirstName,
 		LastName:       user.LastName,
 		RegisterNumber: user.RegNumber,
+		Verified:       user.Verified,
 	}
 }
 

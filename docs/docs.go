@@ -1389,6 +1389,9 @@ var doc = `{
                 },
                 "user_id": {
                     "type": "string"
+                },
+                "verified": {
+                    "type": "boolean"
                 }
             }
         },

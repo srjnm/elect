@@ -13,6 +13,7 @@ type GeneralStudentDTO struct {
 	FirstName      string `json:"first_name"`
 	LastName       string `json:"last_name"`
 	RegisterNumber string `json:"reg_number"`
+	Verified       bool   `json:"verified"`
 }
 
 // Auth DTOs

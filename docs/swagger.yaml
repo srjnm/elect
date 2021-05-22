@@ -190,6 +190,8 @@ definitions:
         type: string
       user_id:
         type: string
+      verified:
+        type: boolean
     type: object
   dto.Login:
     properties:

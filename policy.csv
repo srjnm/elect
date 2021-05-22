@@ -6,14 +6,13 @@ p, *, /checktoken/*, POST, allow
 p, *, /resettoken/*, POST, allow
 p, *, /createresettoken, POST, allow
 p, *, /resetpassword, POST, allow
-p, -1, /verify/*, GET, allow
+p, *, /verify/*, GET, allow
+p, *, /verifytoken/*, POST, allow
 p, -1, /login, POST, allow
 p, -2, /otp, POST, allow
 p, -2, /otp, GET, allow
 p, -2, /login, POST, allow
 p, 2, /login, POST, deny
-p, 2, /verify/*, GET, deny
-p, 2, /setpassword, POST, deny
 p, 2, /otp, POST, deny
 p, 2, /otp, GET, deny
 p, 2, /api/candidate, POST, deny
