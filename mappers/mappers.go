@@ -3,7 +3,6 @@ package mappers
 import (
 	"elect/dto"
 	"elect/models"
-	"strings"
 	"time"
 
 	uuid "github.com/satori/go.uuid"
@@ -57,12 +56,15 @@ func ToGeneralStudentDTOFromUser(user models.User) dto.GeneralStudentDTO {
 }
 
 func ToElectionFromCreateElectionDTO(electionDTO dto.CreateElectionDTO) models.Election {
-	sT := strings.SplitAfter(electionDTO.StartingAt, "(")[0]
-	sTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", sT[:len(sT)-2])
-	eT := strings.SplitAfter(electionDTO.EndingAt, "(")[0]
-	eTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", eT[:len(eT)-2])
-	lT := strings.SplitAfter(electionDTO.LockingAt, "(")[0]
-	lTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", lT[:len(lT)-2])
+	// sT := strings.SplitAfter(electionDTO.StartingAt, "(")[0]
+	// sTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", sT[:len(sT)-2])
+	sTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", electionDTO.StartingAt)
+	// eT := strings.SplitAfter(electionDTO.EndingAt, "(")[0]
+	// eTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", eT[:len(eT)-2])
+	eTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", electionDTO.EndingAt)
+	// lT := strings.SplitAfter(electionDTO.LockingAt, "(")[0]
+	// lTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", lT[:len(lT)-2])
+	lTime, _ := time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", electionDTO.LockingAt)
 	return models.Election{
 		Title:          electionDTO.Title,
 		StartingAt:     sTime,
@@ -75,20 +77,23 @@ func ToElectionFromCreateElectionDTO(electionDTO dto.CreateElectionDTO) models.E
 func ToElectionFromEditElectionDTO(editElectionDTO dto.EditElectionDTO) models.Election {
 	var sTime, eTime, lTime time.Time
 	if editElectionDTO.StartingAt != "" {
-		sT := strings.SplitAfter(editElectionDTO.StartingAt, "(")[0]
-		sTime, _ = time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", sT[:len(sT)-2])
+		// sT := strings.SplitAfter(editElectionDTO.StartingAt, "(")[0]
+		// sTime, _ = time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", sT[:len(sT)-2])
+		sTime, _ = time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", editElectionDTO.StartingAt)
 		sTime = sTime.UTC()
 	}
 
 	if editElectionDTO.EndingAt != "" {
-		eT := strings.SplitAfter(editElectionDTO.EndingAt, "(")[0]
-		eTime, _ = time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", eT[:len(eT)-2])
+		// eT := strings.SplitAfter(editElectionDTO.EndingAt, "(")[0]
+		// eTime, _ = time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", eT[:len(eT)-2])
+		eTime, _ = time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", editElectionDTO.EndingAt)
 		eTime = eTime.UTC()
 	}
 
 	if editElectionDTO.LockingAt != "" {
-		lT := strings.SplitAfter(editElectionDTO.LockingAt, "(")[0]
-		lTime, _ = time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", lT[:len(lT)-2])
+		// lT := strings.SplitAfter(editElectionDTO.LockingAt, "(")[0]
+		// lTime, _ = time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", lT[:len(lT)-2])
+		lTime, _ = time.Parse("Mon Jan 02 2006 15:04:05 GMT-0700", editElectionDTO.LockingAt)
 		lTime = lTime.UTC()
 	}
 
