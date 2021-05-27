@@ -131,7 +131,7 @@ func main() {
 	apiRoutes.GET("/results/:id", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.GetElectionResultsHandler)
 
 	//Elections Update WebSocket
-	apiRoutes.GET("/ws/election", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.ElectionUpdatesHandler)
+	apiRoutes.GET("/ws/election" /*middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService),*/, electionAPI.ElectionUpdatesHandler)
 
 	//Swagger Endpoint Integration
 	server.GET("/docs", middlewares.Authorizer(jwtService, authEnforcer), func(cxt *gin.Context) {
