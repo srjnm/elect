@@ -161,7 +161,7 @@ func (db *postgresDatabase) AddParticipant(userId string, electId string, regno 
 func (db *postgresDatabase) GetElectionsForAdmins(userId string, paginatorParams dto.PaginatorParams) ([]models.Election, error) {
 	var elections []models.Election
 	if paginatorParams.Page == "" {
-		res := db.connection.Model(&models.Election{}).Where("created_by = ?", userId).Find(&elections)
+		res := db.connection.Model(&models.Election{}).Where("created_by = ?", userId).Order("created_at DESC").Find(&elections)
 		if res.Error != nil {
 			log.Println(res.Error.Error())
 			return nil, res.Error
@@ -189,7 +189,7 @@ func (db *postgresDatabase) GetElectionsForAdmins(userId string, paginatorParams
 
 func (db *postgresDatabase) GetElectionsForStudents(userId string, paginatorParams dto.PaginatorParams) ([]models.Election, error) {
 	var electionIds []models.Participant
-	res := db.connection.Model(&models.Participant{}).Where("user_id = ?", userId).Find(&electionIds)
+	res := db.connection.Model(&models.Participant{}).Where("user_id = ?", userId).Order("created_at DESC").Find(&electionIds)
 	if res.Error != nil {
 		log.Println(res.Error.Error())
 		return nil, res.Error
