@@ -49,6 +49,7 @@ func (election *ElectionAPI) CreateElectionHandler(cxt *gin.Context) {
 
 	default:
 	}
+
 	cxt.JSON(http.StatusOK, dto.Response{
 		Message: "Created Election.",
 	})
@@ -74,7 +75,12 @@ func (election *ElectionAPI) EditElectionHandler(cxt *gin.Context) {
 		return
 	}
 
-	update <- []byte("update")
+	select {
+	case update <- []byte("update"):
+
+	default:
+	}
+
 	cxt.JSON(http.StatusOK, dto.Response{
 		Message: "Election edited.",
 	})
@@ -100,7 +106,12 @@ func (election *ElectionAPI) DeleteElectionHandler(cxt *gin.Context) {
 		return
 	}
 
-	update <- []byte("update")
+	select {
+	case update <- []byte("update"):
+
+	default:
+	}
+
 	cxt.JSON(http.StatusOK, dto.Response{
 		Message: "Election deleted.",
 	})
