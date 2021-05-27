@@ -44,7 +44,11 @@ func (election *ElectionAPI) CreateElectionHandler(cxt *gin.Context) {
 		return
 	}
 
-	update <- []byte("update")
+	select {
+	case update <- []byte("update"):
+
+	default:
+	}
 	cxt.JSON(http.StatusOK, dto.Response{
 		Message: "Created Election.",
 	})
