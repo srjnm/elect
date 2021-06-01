@@ -138,6 +138,14 @@ func SetUpQORAdmin(db *gorm.DB) *http.ServeMux {
 			e.StartingAt = e.StartingAt.In(tZone)
 			return e.StartingAt
 		},
+		Setter: func(record interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+			value := metaValue.Value.([]string)
+			sTime := value[0] + ":00 GMT+0530"
+			t, _ := time.Parse("2006-01-02 15:04:05 GMT-0700", sTime)
+
+			e := record.(*models.Election)
+			e.StartingAt = t
+		},
 	})
 	elect.Meta(&admin.Meta{
 		Name: "EndingAt",
@@ -151,6 +159,14 @@ func SetUpQORAdmin(db *gorm.DB) *http.ServeMux {
 			e.EndingAt = e.EndingAt.In(tZone)
 			return e.EndingAt
 		},
+		Setter: func(record interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+			value := metaValue.Value.([]string)
+			sTime := value[0] + ":00 GMT+0530"
+			t, _ := time.Parse("2006-01-02 15:04:05 GMT-0700", sTime)
+
+			e := record.(*models.Election)
+			e.EndingAt = t
+		},
 	})
 	elect.Meta(&admin.Meta{
 		Name: "LockingAt",
@@ -163,6 +179,14 @@ func SetUpQORAdmin(db *gorm.DB) *http.ServeMux {
 			}
 			e.LockingAt = e.LockingAt.In(tZone)
 			return e.LockingAt
+		},
+		Setter: func(record interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+			value := metaValue.Value.([]string)
+			sTime := value[0] + ":00 GMT+0530"
+			t, _ := time.Parse("2006-01-02 15:04:05 GMT-0700", sTime)
+
+			e := record.(*models.Election)
+			e.LockingAt = t
 		},
 	})
 
