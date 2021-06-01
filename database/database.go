@@ -138,10 +138,6 @@ func SetUpQORAdmin(db *gorm.DB) *http.ServeMux {
 			e.StartingAt = e.StartingAt.In(tZone)
 			return e.StartingAt
 		},
-		Setter: func(record interface{}, metaValue *resource.MetaValue, context *qor.Context) {
-			e := record.(*models.Election)
-			e.StartingAt = e.StartingAt.UTC()
-		},
 	})
 	elect.Meta(&admin.Meta{
 		Name: "EndingAt",
@@ -155,10 +151,6 @@ func SetUpQORAdmin(db *gorm.DB) *http.ServeMux {
 			e.EndingAt = e.EndingAt.In(tZone)
 			return e.EndingAt
 		},
-		Setter: func(record interface{}, metaValue *resource.MetaValue, context *qor.Context) {
-			e := record.(*models.Election)
-			e.EndingAt = e.EndingAt.UTC()
-		},
 	})
 	elect.Meta(&admin.Meta{
 		Name: "LockingAt",
@@ -171,10 +163,6 @@ func SetUpQORAdmin(db *gorm.DB) *http.ServeMux {
 			}
 			e.LockingAt = e.LockingAt.In(tZone)
 			return e.LockingAt
-		},
-		Setter: func(record interface{}, metaValue *resource.MetaValue, context *qor.Context) {
-			e := record.(*models.Election)
-			e.LockingAt = e.LockingAt.UTC()
 		},
 	})
 
