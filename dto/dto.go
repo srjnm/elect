@@ -132,6 +132,9 @@ type GeneralCandidateDTO struct {
 	CandidateID    string `json:"candidate_id"`
 	UserID         string `json:"user_id"`
 	ElectionID     string `json:"election_id"`
+	RegisterNo     string `json:"register_no"`
+	FirstName      string `json:"first_name"`
+	LastName       string `json:"last_name"`
 	Sex            int    `json:"sex"`
 	DisplayPicture string `json:"display_picture"`
 	Poster         string `json:"poster"`

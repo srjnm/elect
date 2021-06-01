@@ -1268,10 +1268,19 @@ var doc = `{
                 "election_id": {
                     "type": "string"
                 },
+                "first_name": {
+                    "type": "string"
+                },
                 "id_proof": {
                     "type": "string"
                 },
+                "last_name": {
+                    "type": "string"
+                },
                 "poster": {
+                    "type": "string"
+                },
+                "register_no": {
                     "type": "string"
                 },
                 "sex": {

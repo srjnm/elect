@@ -166,7 +166,12 @@ func (service *electionService) GetElectionForAdmins(userId string, electionId s
 
 	var generalCandidateDTOs []dto.GeneralCandidateDTO
 	for _, candidate := range candidates {
-		generalCandidateDTOs = append(generalCandidateDTOs, mappers.ToGeneralCandidateDTOFromCandidate(candidate))
+		user, err := service.database.GetUser(candidate.UserID.String())
+		if err != nil {
+			return dto.GeneralElectionDTO{}, err
+		}
+
+		generalCandidateDTOs = append(generalCandidateDTOs, mappers.ToGeneralCandidateDTOFromCandidate(candidate, user))
 	}
 
 	return mappers.ToGeneralElectionDTOForAdmins(election, generalParticipantDTOs, generalCandidateDTOs), nil
@@ -180,7 +185,12 @@ func (service *electionService) GetElectionForStudents(userId string, electionId
 
 	var generalCandidateDTOs []dto.GeneralCandidateDTO
 	for _, candidate := range candidates {
-		generalCandidateDTOs = append(generalCandidateDTOs, mappers.ToGeneralCandidateDTOFromCandidate(candidate))
+		user, err := service.database.GetUser(candidate.UserID.String())
+		if err != nil {
+			return dto.GeneralElectionDTO{}, err
+		}
+
+		generalCandidateDTOs = append(generalCandidateDTOs, mappers.ToGeneralCandidateDTOFromCandidate(candidate, user))
 	}
 
 	return mappers.ToGeneralElectionDTOForStudents(election, generalCandidateDTOs), nil

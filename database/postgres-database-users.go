@@ -63,3 +63,14 @@ func (db *postgresDatabase) DeleteRegisteredStudent(userId string, studentUserId
 
 	return nil
 }
+
+func (db *postgresDatabase) GetUser(userId string) (models.User, error) {
+	var user models.User
+
+	res := db.connection.Where("user_id = ?", userId).Find(&user)
+	if res.Error != nil {
+		return models.User{}, res.Error
+	}
+
+	return user, nil
+}

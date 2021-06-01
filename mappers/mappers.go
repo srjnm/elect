@@ -161,11 +161,14 @@ func ToGeneralParticipantDTOFromUser(participantId string, user models.User) dto
 	}
 }
 
-func ToGeneralCandidateDTOFromCandidate(candidate models.Candidate) dto.GeneralCandidateDTO {
+func ToGeneralCandidateDTOFromCandidate(candidate models.Candidate, user models.User) dto.GeneralCandidateDTO {
 	return dto.GeneralCandidateDTO{
 		CandidateID:    candidate.CandidateID.String(),
 		UserID:         candidate.UserID.String(),
 		ElectionID:     candidate.ElectionID.String(),
+		RegisterNo:     user.RegNumber,
+		FirstName:      user.FirstName,
+		LastName:       user.LastName,
 		Sex:            candidate.Sex,
 		DisplayPicture: candidate.DisplayPicture,
 		Poster:         candidate.Poster,

@@ -40,6 +40,7 @@ type Database interface {
 	RegisterStudent(user models.User) error
 	RegisteredStudents(userId string, paginatorParams dto.PaginatorParams) ([]models.User, error)
 	DeleteRegisteredStudent(userId string, studentUserId string) error
+	GetUser(userId string) (models.User, error)
 
 	// Election
 	CreateElection(election models.Election) error
