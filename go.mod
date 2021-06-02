@@ -17,6 +17,7 @@ require (
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/websocket v1.4.2
 	github.com/hgfischer/go-otp v1.0.0
+	github.com/jfeliu007/goplantuml v1.5.2 // indirect
 	github.com/jinzhu/configor v1.2.1 // indirect
 	github.com/jinzhu/gorm v1.9.16
 	github.com/joho/godotenv v1.3.0
@@ -27,6 +28,7 @@ require (
 	github.com/qor/validations v0.0.0-20171228122639-f364bca61b46
 	github.com/rs/cors v1.7.0
 	github.com/satori/go.uuid v1.2.0
+	github.com/spf13/afero v1.6.0 // indirect
 	github.com/swaggo/files v0.0.0-20190704085106-630677cd5c14
 	github.com/swaggo/gin-swagger v1.3.0
 	github.com/swaggo/swag v1.7.0

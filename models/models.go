@@ -50,6 +50,7 @@ type Participant struct {
 }
 
 type Blacklist struct {
+	gorm.Model
 	BlacklistID uuid.UUID `gorm:"primary_key; type:uuid; default:uuid_generate_v4()"`
 	User        User      `gorm:"foreignKey: UserID; constraint:OnDelete:CASCADE;"`
 	UserID      uuid.UUID `gorm:"unique"`
@@ -67,6 +68,7 @@ type Candidate struct {
 	IDProof        string    `gorm:"not null"`
 	Approved       bool      `gorm:"not null; default: false"`
 	Votes          int       `gorm:"not null; default: 0"`
+	Base
 }
 
 type ResetToken struct {

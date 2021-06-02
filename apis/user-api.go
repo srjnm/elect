@@ -21,6 +21,7 @@ func NewUserAPI(userController controllers.UserController) *UserAPI {
 
 // RegisterStudents godoc
 // @Summary Register Students if you are an Admin
+// @ID registerStudents
 // @Tags user
 // @Consume multipart/form-data
 // @Produce json
@@ -46,6 +47,7 @@ func (user *UserAPI) RegisterStudentsHandler(cxt *gin.Context) {
 
 // RegisteredStudents godoc
 // @Summary Get a list of Students you've registered
+// @ID registeredStudents
 // @Tags user
 // @Produce json
 // @Param page query string false "Page"
@@ -71,6 +73,7 @@ func (user *UserAPI) RegisteredStudentsHandler(cxt *gin.Context) {
 
 // DeleteRegisteredStudent godoc
 // @Summary Delete the student you have registered
+// @ID deleteRegisteredStudent
 // @Tags user
 // @Produce json
 // @Param id path string true "Student ID"

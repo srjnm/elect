@@ -26,6 +26,7 @@ var update = make(chan []byte, 1)
 
 // CreateElection godoc
 // @Summary Create Election if you are an Admin
+// @ID election
 // @Tags election
 // @Produce json
 // @Param election body dto.CreateElectionDTO true "Election Details"
@@ -58,6 +59,7 @@ func (election *ElectionAPI) CreateElectionHandler(cxt *gin.Context) {
 
 // EditElection godoc
 // @Summary Edit the election you created
+// @ID election
 // @Tags election
 // @Produce json
 // @Param election body dto.EditElectionDTO true "Edit Election"
@@ -89,6 +91,7 @@ func (election *ElectionAPI) EditElectionHandler(cxt *gin.Context) {
 
 // DeleteElection godoc
 // @Summary Delete the election you created
+// @ID electionP
 // @Tags election
 // @Produce json
 // @Param id path string true "Election ID"
@@ -120,6 +123,7 @@ func (election *ElectionAPI) DeleteElectionHandler(cxt *gin.Context) {
 
 // AddParticipants godoc
 // @Summary Add participants to the election you created
+// @ID addParticipants
 // @Tags participant
 // @Consume multipart/form-data
 // @Produce json
@@ -147,6 +151,7 @@ func (election *ElectionAPI) AddParticipantsHandler(cxt *gin.Context) {
 
 // DeleteParticipant godoc
 // @Summary Delete the participant of the election you created
+// @ID participant
 // @Tags participant
 // @Produce json
 // @Param participant body dto.DeleteParticipantDTO true "Delete Participant"
@@ -172,6 +177,7 @@ func (election *ElectionAPI) DeleteParticipantHandler(cxt *gin.Context) {
 
 // Elections godoc
 // @Summary Get a list of election you are part of OR you have created
+// @ID elections
 // @Tags election
 // @Produce json
 // @Param page query string false "Page"
@@ -197,6 +203,7 @@ func (election *ElectionAPI) GetElectionsHandler(cxt *gin.Context) {
 
 // EnrollCandidate godoc
 // @Summary Enroll as a candidate for the election you are part of
+// @ID enrollCandidate
 // @Tags candidate
 // @Consume multipart/form-data
 // @Produce json
@@ -225,6 +232,7 @@ func (election *ElectionAPI) EnrollCandidateHandler(cxt *gin.Context) {
 
 // ApproveCandidate godoc
 // @Summary Approve enrolled candidates to the election you created
+// @ID approveCandidate
 // @Tags candidate
 // @Produce json
 // @Param id path string true "Candidate ID"
@@ -249,6 +257,7 @@ func (election *ElectionAPI) ApproveCandidateHandler(cxt *gin.Context) {
 
 // UnapproveCandidate godoc
 // @Summary Unapprove enrolled candidates to the election you created
+// @ID unapproveCandidate
 // @Tags candidate
 // @Produce json
 // @Param id path string true "Candidate ID"
@@ -273,6 +282,7 @@ func (election *ElectionAPI) UnapproveCandidateHandler(cxt *gin.Context) {
 
 // GetElection godoc
 // @Summary Get details of the election you created or you are part of
+// @ID electionP
 // @Tags election
 // @Produce json
 // @Param id path string true "Election ID"
@@ -295,6 +305,7 @@ func (election *ElectionAPI) GetElectionHandler(cxt *gin.Context) {
 
 // CastVote godoc
 // @Summary Cast vote to the candidate of the election you are part of
+// @ID castVote
 // @Tags participant
 // @Produce json
 // @Param vote body dto.CastVoteDTO true "Cast Vote"
@@ -319,6 +330,7 @@ func (election *ElectionAPI) CastVoteHandler(cxt *gin.Context) {
 
 // GetElectionResults godoc
 // @Summary Get the results of the election you were part of or you created
+// @ID getElectionResults
 // @Tags election
 // @Produce json
 // @Param id path string true "Election ID"

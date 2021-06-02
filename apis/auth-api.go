@@ -20,6 +20,7 @@ func NewAuthAPI(userController controllers.UserController) *AuthAPI {
 
 // Login godoc
 // @Summary User Login
+// @ID login
 // @Tags auth
 // @Consume json
 // @Produce json
@@ -47,6 +48,7 @@ func (auth *AuthAPI) LoginHandler(cxt *gin.Context) {
 
 // Logout godoc
 // @Summary User Logout
+// @ID logout
 // @Tags auth
 // @Description A user has to be logged in currently to access this endpoint.
 // @Produce json
@@ -86,6 +88,7 @@ func (auth *AuthAPI) LogoutHandler(cxt *gin.Context) {
 
 // Refresh godoc
 // @Summary Refresh Token
+// @ID refresh
 // @Tags auth
 // @Description A user needs a valid refresh token to access this endpoint.
 // @Produce json
@@ -120,6 +123,7 @@ func (auth *AuthAPI) RefreshHandler(cxt *gin.Context) {
 
 // Verify godoc
 // @Summary Verify Email and Set Password
+// @ID verify
 // @Tags auth
 // @Produce json
 // @Param password body dto.Verify true "Verify"
@@ -171,6 +175,7 @@ func (auth *AuthAPI) OTPGETHandler(cxt *gin.Context) {
 
 // SubmitOTP godoc
 // @Summary Submit OTP
+// @ID submitOTP
 // @Tags auth
 // @Produce json
 // @Param otp body dto.OTP true "Verify OTP"
@@ -212,6 +217,7 @@ func (auth *AuthAPI) OTPHandler(cxt *gin.Context) {
 
 // ChangePassword godoc
 // @Summary Change your password
+// @ID changePassword
 // @Tags auth
 // @Produce json
 // @Param changePassword body dto.ChangePasswordDTO true "Change Password"
@@ -237,6 +243,7 @@ func (auth *AuthAPI) ChangePasswordHandler(cxt *gin.Context) {
 
 // CheckVerifyTokenValidity godoc
 // @Summary Check if verify token is valid or not
+// @ID checkVerifyTokenValidity
 // @Tags auth
 // @Produce json
 // @Param token path string true "Verify Token"
@@ -262,6 +269,7 @@ func (auth *AuthAPI) CheckVerifyTokenValidityHandler(cxt *gin.Context) {
 
 // CheckResetTokenValidity godoc
 // @Summary Check if reset token is valid or not
+// @ID checkResetTokenValidity
 // @Tags auth
 // @Produce json
 // @Param token path string true "Reset Token"
@@ -287,6 +295,7 @@ func (auth *AuthAPI) CheckResetTokenValidityHandler(cxt *gin.Context) {
 
 // CreateResetToken godoc
 // @Summary Create a reset token and send email to reset password
+// @ID createResetToken
 // @Tags auth
 // @Produce json
 // @Param createResetToken body dto.CreateResetTokenDTO true "Email"
@@ -312,6 +321,7 @@ func (auth *AuthAPI) CreateResetTokenHandler(cxt *gin.Context) {
 
 // ResetPassword godoc
 // @Summary Reset password if you have a valid token
+// @ID resetPassword
 // @Tags auth
 // @Produce json
 // @Param createResetToken body dto.ResetPasswordDTO true "Reset Password"

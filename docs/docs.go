@@ -36,6 +36,7 @@ var doc = `{
                     "candidate"
                 ],
                 "summary": "Enroll as a candidate for the election you are part of",
+                "operationId": "enrollCandidate",
                 "parameters": [
                     {
                         "type": "string",
@@ -102,6 +103,7 @@ var doc = `{
                     "candidate"
                 ],
                 "summary": "Approve enrolled candidates to the election you created",
+                "operationId": "approveCandidate",
                 "parameters": [
                     {
                         "type": "string",
@@ -142,6 +144,7 @@ var doc = `{
                     "candidate"
                 ],
                 "summary": "Unapprove enrolled candidates to the election you created",
+                "operationId": "unapproveCandidate",
                 "parameters": [
                     {
                         "type": "string",
@@ -182,6 +185,7 @@ var doc = `{
                     "election"
                 ],
                 "summary": "Edit the election you created",
+                "operationId": "election",
                 "parameters": [
                     {
                         "description": "Edit Election",
@@ -222,6 +226,7 @@ var doc = `{
                     "election"
                 ],
                 "summary": "Create Election if you are an Admin",
+                "operationId": "election",
                 "parameters": [
                     {
                         "description": "Election Details",
@@ -264,6 +269,7 @@ var doc = `{
                     "election"
                 ],
                 "summary": "Get details of the election you created or you are part of",
+                "operationId": "electionP",
                 "parameters": [
                     {
                         "type": "string",
@@ -302,6 +308,7 @@ var doc = `{
                     "election"
                 ],
                 "summary": "Delete the election you created",
+                "operationId": "electionP",
                 "parameters": [
                     {
                         "type": "string",
@@ -342,6 +349,7 @@ var doc = `{
                     "election"
                 ],
                 "summary": "Get a list of election you are part of OR you have created",
+                "operationId": "elections",
                 "parameters": [
                     {
                         "type": "string",
@@ -402,6 +410,7 @@ var doc = `{
                     "participant"
                 ],
                 "summary": "Delete the participant of the election you created",
+                "operationId": "participant",
                 "parameters": [
                     {
                         "description": "Delete Participant",
@@ -444,6 +453,7 @@ var doc = `{
                     "participant"
                 ],
                 "summary": "Add participants to the election you created",
+                "operationId": "addParticipants",
                 "parameters": [
                     {
                         "type": "string",
@@ -491,6 +501,7 @@ var doc = `{
                     "user"
                 ],
                 "summary": "Delete the student you have registered",
+                "operationId": "deleteRegisteredStudent",
                 "parameters": [
                     {
                         "type": "string",
@@ -531,6 +542,7 @@ var doc = `{
                     "user"
                 ],
                 "summary": "Get a list of Students you've registered",
+                "operationId": "registeredStudents",
                 "parameters": [
                     {
                         "type": "string",
@@ -591,6 +603,7 @@ var doc = `{
                     "user"
                 ],
                 "summary": "Register Students if you are an Admin",
+                "operationId": "registerStudents",
                 "parameters": [
                     {
                         "type": "file",
@@ -631,6 +644,7 @@ var doc = `{
                     "election"
                 ],
                 "summary": "Get the results of the election you were part of or you created",
+                "operationId": "getElectionResults",
                 "parameters": [
                     {
                         "type": "string",
@@ -671,6 +685,7 @@ var doc = `{
                     "participant"
                 ],
                 "summary": "Cast vote to the candidate of the election you are part of",
+                "operationId": "castVote",
                 "parameters": [
                     {
                         "description": "Cast Vote",
@@ -713,6 +728,7 @@ var doc = `{
                     "auth"
                 ],
                 "summary": "Change your password",
+                "operationId": "changePassword",
                 "parameters": [
                     {
                         "description": "Change Password",
@@ -755,6 +771,7 @@ var doc = `{
                     "auth"
                 ],
                 "summary": "Create a reset token and send email to reset password",
+                "operationId": "createResetToken",
                 "parameters": [
                     {
                         "description": "Email",
@@ -797,6 +814,7 @@ var doc = `{
                     "auth"
                 ],
                 "summary": "User Login",
+                "operationId": "login",
                 "parameters": [
                     {
                         "description": "User Login",
@@ -840,6 +858,7 @@ var doc = `{
                     "auth"
                 ],
                 "summary": "User Logout",
+                "operationId": "logout",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -871,6 +890,7 @@ var doc = `{
                     "auth"
                 ],
                 "summary": "Submit OTP",
+                "operationId": "submitOTP",
                 "parameters": [
                     {
                         "description": "Verify OTP",
@@ -914,6 +934,7 @@ var doc = `{
                     "auth"
                 ],
                 "summary": "Refresh Token",
+                "operationId": "refresh",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -945,6 +966,7 @@ var doc = `{
                     "auth"
                 ],
                 "summary": "Reset password if you have a valid token",
+                "operationId": "resetPassword",
                 "parameters": [
                     {
                         "description": "Reset Password",
@@ -987,6 +1009,7 @@ var doc = `{
                     "auth"
                 ],
                 "summary": "Check if reset token is valid or not",
+                "operationId": "checkResetTokenValidity",
                 "parameters": [
                     {
                         "type": "string",
@@ -1027,6 +1050,7 @@ var doc = `{
                     "auth"
                 ],
                 "summary": "Verify Email and Set Password",
+                "operationId": "verify",
                 "parameters": [
                     {
                         "description": "Verify",
@@ -1069,6 +1093,7 @@ var doc = `{
                     "auth"
                 ],
                 "summary": "Check if verify token is valid or not",
+                "operationId": "checkVerifyTokenValidity",
                 "parameters": [
                     {
                         "type": "string",

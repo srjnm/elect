@@ -273,6 +273,7 @@ info:
 paths:
   /api/candidate:
     post:
+      operationId: enrollCandidate
       parameters:
       - in: formData
         name: election_id
@@ -317,6 +318,7 @@ paths:
       - candidate
   /api/candidate/approve/{id}:
     post:
+      operationId: approveCandidate
       parameters:
       - description: Candidate ID
         in: path
@@ -343,6 +345,7 @@ paths:
       - candidate
   /api/candidate/unapprove/{id}:
     post:
+      operationId: unapproveCandidate
       parameters:
       - description: Candidate ID
         in: path
@@ -369,6 +372,7 @@ paths:
       - candidate
   /api/election:
     post:
+      operationId: election
       parameters:
       - description: Election Details
         in: body
@@ -395,6 +399,7 @@ paths:
       tags:
       - election
     put:
+      operationId: election
       parameters:
       - description: Edit Election
         in: body
@@ -422,6 +427,7 @@ paths:
       - election
   /api/election/{id}:
     delete:
+      operationId: electionP
       parameters:
       - description: Election ID
         in: path
@@ -447,6 +453,7 @@ paths:
       tags:
       - election
     get:
+      operationId: electionP
       parameters:
       - description: Election ID
         in: path
@@ -473,6 +480,7 @@ paths:
       - election
   /api/elections:
     get:
+      operationId: elections
       parameters:
       - description: Page
         in: query
@@ -512,6 +520,7 @@ paths:
       - election
   /api/participant:
     delete:
+      operationId: participant
       parameters:
       - description: Delete Participant
         in: body
@@ -539,6 +548,7 @@ paths:
       - participant
   /api/participants/{id}:
     post:
+      operationId: addParticipants
       parameters:
       - description: Election ID
         in: path
@@ -570,6 +580,7 @@ paths:
       - participant
   /api/registeredstudent/{id}:
     delete:
+      operationId: deleteRegisteredStudent
       parameters:
       - description: Student ID
         in: path
@@ -596,6 +607,7 @@ paths:
       - user
   /api/registeredstudents:
     get:
+      operationId: registeredStudents
       parameters:
       - description: Page
         in: query
@@ -635,6 +647,7 @@ paths:
       - user
   /api/registerstudents:
     post:
+      operationId: registerStudents
       parameters:
       - description: Student List
         in: formData
@@ -661,6 +674,7 @@ paths:
       - user
   /api/results/{id}:
     get:
+      operationId: getElectionResults
       parameters:
       - description: Election ID
         in: path
@@ -687,6 +701,7 @@ paths:
       - election
   /api/vote:
     post:
+      operationId: castVote
       parameters:
       - description: Cast Vote
         in: body
@@ -714,6 +729,7 @@ paths:
       - participant
   /changepassword:
     post:
+      operationId: changePassword
       parameters:
       - description: Change Password
         in: body
@@ -741,6 +757,7 @@ paths:
       - auth
   /createresettoken:
     post:
+      operationId: createResetToken
       parameters:
       - description: Email
         in: body
@@ -768,6 +785,7 @@ paths:
       - auth
   /login:
     post:
+      operationId: login
       parameters:
       - description: User Login
         in: body
@@ -796,6 +814,7 @@ paths:
   /logout:
     post:
       description: A user has to be logged in currently to access this endpoint.
+      operationId: logout
       produces:
       - application/json
       responses:
@@ -816,6 +835,7 @@ paths:
       - auth
   /otp:
     post:
+      operationId: submitOTP
       parameters:
       - description: Verify OTP
         in: body
@@ -844,6 +864,7 @@ paths:
   /refresh:
     post:
       description: A user needs a valid refresh token to access this endpoint.
+      operationId: refresh
       produces:
       - application/json
       responses:
@@ -864,6 +885,7 @@ paths:
       - auth
   /resetpassword:
     post:
+      operationId: resetPassword
       parameters:
       - description: Reset Password
         in: body
@@ -891,6 +913,7 @@ paths:
       - auth
   /resettoken/{token}:
     post:
+      operationId: checkResetTokenValidity
       parameters:
       - description: Reset Token
         in: path
@@ -917,6 +940,7 @@ paths:
       - auth
   /setpassword:
     post:
+      operationId: verify
       parameters:
       - description: Verify
         in: body
@@ -944,6 +968,7 @@ paths:
       - auth
   /verifytoken/{token}:
     post:
+      operationId: checkVerifyTokenValidity
       parameters:
       - description: Verify Token
         in: path
