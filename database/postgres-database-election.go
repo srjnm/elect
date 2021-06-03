@@ -49,7 +49,9 @@ func (db *postgresDatabase) EditElection(userId string, election models.Election
 		return errors.New("Election Locked!")
 	}
 
-	res = db.connection.Update(&election)
+	election.ElectionID = uuid.Nil
+
+	res = db.connection.Model(&models.Election{}).Where("election_id = ?", findElection.ElectionID.String()).Update(&election)
 	if res.Error != nil {
 		log.Println(res.Error.Error())
 		return res.Error
