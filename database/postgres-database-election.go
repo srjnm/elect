@@ -49,9 +49,7 @@ func (db *postgresDatabase) EditElection(userId string, election models.Election
 		return errors.New("Election Locked!")
 	}
 
-	election.ElectionID = uuid.Nil
-
-	res = db.connection.Model(&models.Election{}).Where("election_id = ?", findElection.ElectionID.String()).Update(&election)
+	res = db.connection.Update(&election)
 	if res.Error != nil {
 		log.Println(res.Error.Error())
 		return res.Error
@@ -393,8 +391,7 @@ func (db *postgresDatabase) ApproveCandidate(userId string, candidateId string) 
 		return errors.New("Election Locked!")
 	}
 
-	candidate.Approved = true
-	res = db.connection.Model(&models.Candidate{}).Update(&candidate)
+	res = db.connection.Model(&models.Candidate{}).Where("candidate_id = ? AND election_id = ?", candidateId, candidate.ElectionID.String()).Updates(map[string]interface{}{"approved": true})
 	if res.Error != nil {
 		log.Println(res.Error.Error())
 		return res.Error
@@ -435,8 +432,7 @@ func (db *postgresDatabase) UnapproveCandidate(userId string, candidateId string
 		return errors.New("Election Locked!")
 	}
 
-	candidate.Approved = false
-	res = db.connection.Model(&models.Candidate{}).Update(&candidate)
+	res = db.connection.Model(&models.Candidate{}).Where("candidate_id = ? AND election_id = ?", candidateId, candidate.ElectionID.String()).Updates(map[string]interface{}{"approved": false})
 	if res.Error != nil {
 		log.Println(res.Error.Error())
 		return res.Error

@@ -328,8 +328,8 @@ func (controller *electionController) EnrollCandidate(cxt *gin.Context) error {
 }
 
 func (controller *electionController) ApproveCandidate(cxt *gin.Context) error {
-	participantId := cxt.Param("id")
-	if participantId == "" {
+	candidateId := cxt.Param("id")
+	if candidateId == "" {
 		log.Println("Invalid ID!")
 		return errors.New("Invalid ID!")
 	}
@@ -352,12 +352,12 @@ func (controller *electionController) ApproveCandidate(cxt *gin.Context) error {
 		return err
 	}
 
-	return controller.electionService.ApproveCandidate(userId, participantId)
+	return controller.electionService.ApproveCandidate(userId, candidateId)
 }
 
 func (controller *electionController) UnapproveCandidate(cxt *gin.Context) error {
-	participantId := cxt.Param("id")
-	if participantId == "" {
+	candidateId := cxt.Param("id")
+	if candidateId == "" {
 		log.Println("Invalid ID!")
 		return errors.New("Invalid ID!")
 	}
@@ -380,7 +380,7 @@ func (controller *electionController) UnapproveCandidate(cxt *gin.Context) error
 		return err
 	}
 
-	return controller.electionService.UnapproveCandidate(userId, participantId)
+	return controller.electionService.UnapproveCandidate(userId, candidateId)
 }
 
 func (controller *electionController) GetElection(cxt *gin.Context) (dto.GeneralElectionDTO, error) {

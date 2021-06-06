@@ -51,9 +51,8 @@ type Participant struct {
 
 type Blacklist struct {
 	gorm.Model
-	BlacklistID uuid.UUID `gorm:"primary_key; type:uuid; default:uuid_generate_v4()"`
-	User        User      `gorm:"foreignKey: UserID; constraint:OnDelete:CASCADE;"`
-	UserID      uuid.UUID `gorm:"unique"`
+	User   User      `gorm:"foreignKey: UserID; constraint:OnDelete:CASCADE;"`
+	UserID uuid.UUID `gorm:"unique"`
 }
 
 type Candidate struct {
