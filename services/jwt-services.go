@@ -43,7 +43,7 @@ func (service *jwtService) GenerateToken(authUserDTO dto.AuthUserDTO, role int) 
 		"userid": authUserDTO.UserID,
 		"email":  authUserDTO.Email,
 		"role":   role,
-		"exp":    time.Now().Add(time.Minute * 1).Unix(),
+		"exp":    time.Now().Add(time.Hour * 1).Unix(),
 		"iss":    service.issuer,
 		"iat":    time.Now().Unix(),
 	}
