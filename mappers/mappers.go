@@ -227,12 +227,14 @@ func ToGeneralElectionResultsDTOForStudents(election models.Election, candidateR
 	}
 }
 
-func ToCandidateResultsDTOFromCandidate(candidate models.Candidate) dto.CandidateResultsDTO {
+func ToCandidateResultsDTOFromCandidate(candidate models.Candidate, name string) dto.CandidateResultsDTO {
 	return dto.CandidateResultsDTO{
 		CandidateID:    candidate.CandidateID.String(),
 		UserID:         candidate.UserID.String(),
+		Name:           name,
 		Sex:            candidate.Sex,
 		ElectionID:     candidate.ElectionID.String(),
 		DisplayPicture: candidate.DisplayPicture,
+		Votes:          candidate.Votes,
 	}
 }

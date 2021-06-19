@@ -231,7 +231,7 @@ func SetUpQORAdmin(db *gorm.DB) *http.ServeMux {
 			values := metaValue.Value.([]string)
 			if len(values) > 0 {
 				if id := values[0]; id != "" {
-					p := resource.(*models.Participant)
+					p := resource.(*models.Candidate)
 					p.UserID = uuid.FromStringOrNil(id)
 				}
 			}
@@ -244,7 +244,7 @@ func SetUpQORAdmin(db *gorm.DB) *http.ServeMux {
 			values := metaValue.Value.([]string)
 			if len(values) > 0 {
 				if id := values[0]; id != "" {
-					p := resource.(*models.Participant)
+					p := resource.(*models.Candidate)
 					p.ElectionID = uuid.FromStringOrNil(id)
 				}
 			}

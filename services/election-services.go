@@ -208,7 +208,11 @@ func (service *electionService) GetElectionResults(userId string, role int, elec
 
 	var candidateResultsDTOs []dto.CandidateResultsDTO
 	for _, candidate := range candidates {
-		candidateResultsDTOs = append(candidateResultsDTOs, mappers.ToCandidateResultsDTOFromCandidate(candidate))
+		user, err := service.database.GetUser(candidate.UserID.String())
+		if err != nil {
+			return dto.GeneralElectionResultsDTO{}, err
+		}
+		candidateResultsDTOs = append(candidateResultsDTOs, mappers.ToCandidateResultsDTOFromCandidate(candidate, user.FirstName+" "+user.LastName))
 	}
 
 	if role == 1 || role == 2 {

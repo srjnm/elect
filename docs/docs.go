@@ -1139,11 +1139,17 @@ var doc = `{
                 "election_id": {
                     "type": "string"
                 },
+                "name": {
+                    "type": "string"
+                },
                 "sex": {
                     "type": "integer"
                 },
                 "user_id": {
                     "type": "string"
+                },
+                "votes": {
+                    "type": "integer"
                 }
             }
         },
@@ -1366,11 +1372,29 @@ var doc = `{
                 "ending_at": {
                     "type": "string"
                 },
+                "fcandidate_results": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.CandidateResultsDTO"
+                    }
+                },
                 "gender_specific": {
                     "type": "boolean"
                 },
                 "locking_at": {
                     "type": "string"
+                },
+                "mcandidate_results": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.CandidateResultsDTO"
+                    }
+                },
+                "ocandidate_results": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.CandidateResultsDTO"
+                    }
                 },
                 "participants": {
                     "type": "array",

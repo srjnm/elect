@@ -123,9 +123,11 @@ type CastVoteDTO struct {
 type CandidateResultsDTO struct {
 	CandidateID    string `json:"candidate_id"`
 	UserID         string `json:"user_id"`
+	Name           string `json:"name"`
 	Sex            int    `json:"sex"`
 	ElectionID     string `json:"election_id"`
 	DisplayPicture string `json:"display_picture"`
+	Votes          int    `json:"votes"`
 }
 
 type GeneralCandidateDTO struct {
@@ -162,12 +164,15 @@ type GeneralElectionDTO struct {
 }
 
 type GeneralElectionResultsDTO struct {
-	ElectionID       string                  `json:"election_id"`
-	Title            string                  `json:"title"`
-	StartingAt       string                  `json:"starting_at"`
-	EndingAt         string                  `json:"ending_at"`
-	LockingAt        string                  `json:"locking_at"`
-	GenderSpecific   bool                    `json:"gender_specific,omitempty"`
-	Participants     []GeneralParticipantDTO `json:"participants,omitempty"`
-	CandidateResults []CandidateResultsDTO   `json:"candidate_results"`
+	ElectionID        string                  `json:"election_id"`
+	Title             string                  `json:"title"`
+	StartingAt        string                  `json:"starting_at"`
+	EndingAt          string                  `json:"ending_at"`
+	LockingAt         string                  `json:"locking_at"`
+	GenderSpecific    bool                    `json:"gender_specific,omitempty"`
+	Participants      []GeneralParticipantDTO `json:"participants,omitempty"`
+	CandidateResults  []CandidateResultsDTO   `json:"candidate_results,omitempty"`
+	MCandidateResults []CandidateResultsDTO   `json:"mcandidate_results,omitempty"`
+	FCandidateResults []CandidateResultsDTO   `json:"fcandidate_results,omitempty"`
+	OCandidateResults []CandidateResultsDTO   `json:"ocandidate_results,omitempty"`
 }

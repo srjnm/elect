@@ -8,10 +8,14 @@ definitions:
         type: string
       election_id:
         type: string
+      name:
+        type: string
       sex:
         type: integer
       user_id:
         type: string
+      votes:
+        type: integer
     type: object
   dto.CastVoteDTO:
     properties:
@@ -158,10 +162,22 @@ definitions:
         type: string
       ending_at:
         type: string
+      fcandidate_results:
+        items:
+          $ref: '#/definitions/dto.CandidateResultsDTO'
+        type: array
       gender_specific:
         type: boolean
       locking_at:
         type: string
+      mcandidate_results:
+        items:
+          $ref: '#/definitions/dto.CandidateResultsDTO'
+        type: array
+      ocandidate_results:
+        items:
+          $ref: '#/definitions/dto.CandidateResultsDTO'
+        type: array
       participants:
         items:
           $ref: '#/definitions/dto.GeneralParticipantDTO'
