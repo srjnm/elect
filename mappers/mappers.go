@@ -202,28 +202,34 @@ func ToGeneralElectionDTOForStudents(election models.Election, generalCandidateD
 	}
 }
 
-func ToGeneralElectionResultsDTOForAdmins(election models.Election, generalParticipantDTOs []dto.GeneralParticipantDTO, candidateResultsDTOs []dto.CandidateResultsDTO) dto.GeneralElectionResultsDTO {
+func ToGeneralElectionResultsDTOForAdmins(election models.Election, generalParticipantDTOs []dto.GeneralParticipantDTO, candidateResultsDTOs []dto.CandidateResultsDTO, mCandidateResultsDTOs []dto.CandidateResultsDTO, fCandidateResultsDTOs []dto.CandidateResultsDTO, oCandidateResultsDTOs []dto.CandidateResultsDTO) dto.GeneralElectionResultsDTO {
 	return dto.GeneralElectionResultsDTO{
-		ElectionID:       election.ElectionID.String(),
-		Title:            election.Title,
-		StartingAt:       election.StartingAt.String(),
-		EndingAt:         election.EndingAt.String(),
-		LockingAt:        election.LockingAt.String(),
-		GenderSpecific:   election.GenderSpecific,
-		Participants:     generalParticipantDTOs,
-		CandidateResults: candidateResultsDTOs,
+		ElectionID:        election.ElectionID.String(),
+		Title:             election.Title,
+		StartingAt:        election.StartingAt.String(),
+		EndingAt:          election.EndingAt.String(),
+		LockingAt:         election.LockingAt.String(),
+		GenderSpecific:    election.GenderSpecific,
+		Participants:      generalParticipantDTOs,
+		CandidateResults:  candidateResultsDTOs,
+		MCandidateResults: mCandidateResultsDTOs,
+		FCandidateResults: fCandidateResultsDTOs,
+		OCandidateResults: oCandidateResultsDTOs,
 	}
 }
 
-func ToGeneralElectionResultsDTOForStudents(election models.Election, candidateResultsDTOs []dto.CandidateResultsDTO) dto.GeneralElectionResultsDTO {
+func ToGeneralElectionResultsDTOForStudents(election models.Election, candidateResultsDTOs []dto.CandidateResultsDTO, mCandidateResultsDTOs []dto.CandidateResultsDTO, fCandidateResultsDTOs []dto.CandidateResultsDTO, oCandidateResultsDTOs []dto.CandidateResultsDTO) dto.GeneralElectionResultsDTO {
 	return dto.GeneralElectionResultsDTO{
-		ElectionID:       election.ElectionID.String(),
-		Title:            election.Title,
-		StartingAt:       election.StartingAt.String(),
-		EndingAt:         election.EndingAt.String(),
-		LockingAt:        election.LockingAt.String(),
-		GenderSpecific:   election.GenderSpecific,
-		CandidateResults: candidateResultsDTOs,
+		ElectionID:        election.ElectionID.String(),
+		Title:             election.Title,
+		StartingAt:        election.StartingAt.String(),
+		EndingAt:          election.EndingAt.String(),
+		LockingAt:         election.LockingAt.String(),
+		GenderSpecific:    election.GenderSpecific,
+		CandidateResults:  candidateResultsDTOs,
+		MCandidateResults: mCandidateResultsDTOs,
+		FCandidateResults: fCandidateResultsDTOs,
+		OCandidateResults: oCandidateResultsDTOs,
 	}
 }
 

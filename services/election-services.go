@@ -201,29 +201,69 @@ func (service *electionService) CastVote(userId string, castVoteDTO dto.CastVote
 }
 
 func (service *electionService) GetElectionResults(userId string, role int, electionId string) (dto.GeneralElectionResultsDTO, error) {
-	election, candidates, err := service.database.GetResults(userId, role, electionId)
+	election, candidates, mCandidates, fCandidates, oCandidates, err := service.database.GetResults(userId, role, electionId)
 	if err != nil {
 		return dto.GeneralElectionResultsDTO{}, err
 	}
 
-	var candidateResultsDTOs []dto.CandidateResultsDTO
-	for _, candidate := range candidates {
-		user, err := service.database.GetUser(candidate.UserID.String())
-		if err != nil {
-			return dto.GeneralElectionResultsDTO{}, err
-		}
-		candidateResultsDTOs = append(candidateResultsDTOs, mappers.ToCandidateResultsDTOFromCandidate(candidate, user.FirstName+" "+user.LastName))
-	}
-
-	if role == 1 || role == 2 {
-		generalParticipantDTOs, err := service.database.GetElectionParticipants(userId, electionId)
-		if err != nil {
-			return dto.GeneralElectionResultsDTO{}, err
+	if !election.GenderSpecific {
+		var candidateResultsDTOs []dto.CandidateResultsDTO
+		for _, candidate := range candidates {
+			user, err := service.database.GetUser(candidate.UserID.String())
+			if err != nil {
+				return dto.GeneralElectionResultsDTO{}, err
+			}
+			candidateResultsDTOs = append(candidateResultsDTOs, mappers.ToCandidateResultsDTOFromCandidate(candidate, user.FirstName+" "+user.LastName))
 		}
 
-		return mappers.ToGeneralElectionResultsDTOForAdmins(election, generalParticipantDTOs, candidateResultsDTOs), nil
-	} else if role == 0 {
-		return mappers.ToGeneralElectionResultsDTOForStudents(election, candidateResultsDTOs), nil
+		if role == 1 || role == 2 {
+			generalParticipantDTOs, err := service.database.GetElectionParticipants(userId, electionId)
+			if err != nil {
+				return dto.GeneralElectionResultsDTO{}, err
+			}
+
+			return mappers.ToGeneralElectionResultsDTOForAdmins(election, generalParticipantDTOs, candidateResultsDTOs, nil, nil, nil), nil
+		} else if role == 0 {
+			return mappers.ToGeneralElectionResultsDTOForStudents(election, candidateResultsDTOs, nil, nil, nil), nil
+		}
+	} else {
+		var mCandidateResultsDTOs []dto.CandidateResultsDTO
+		for _, candidate := range mCandidates {
+			user, err := service.database.GetUser(candidate.UserID.String())
+			if err != nil {
+				return dto.GeneralElectionResultsDTO{}, err
+			}
+			mCandidateResultsDTOs = append(mCandidateResultsDTOs, mappers.ToCandidateResultsDTOFromCandidate(candidate, user.FirstName+" "+user.LastName))
+		}
+
+		var fCandidateResultsDTOs []dto.CandidateResultsDTO
+		for _, candidate := range fCandidates {
+			user, err := service.database.GetUser(candidate.UserID.String())
+			if err != nil {
+				return dto.GeneralElectionResultsDTO{}, err
+			}
+			fCandidateResultsDTOs = append(fCandidateResultsDTOs, mappers.ToCandidateResultsDTOFromCandidate(candidate, user.FirstName+" "+user.LastName))
+		}
+
+		var oCandidateResultsDTOs []dto.CandidateResultsDTO
+		for _, candidate := range oCandidates {
+			user, err := service.database.GetUser(candidate.UserID.String())
+			if err != nil {
+				return dto.GeneralElectionResultsDTO{}, err
+			}
+			oCandidateResultsDTOs = append(oCandidateResultsDTOs, mappers.ToCandidateResultsDTOFromCandidate(candidate, user.FirstName+" "+user.LastName))
+		}
+
+		if role == 1 || role == 2 {
+			generalParticipantDTOs, err := service.database.GetElectionParticipants(userId, electionId)
+			if err != nil {
+				return dto.GeneralElectionResultsDTO{}, err
+			}
+
+			return mappers.ToGeneralElectionResultsDTOForAdmins(election, generalParticipantDTOs, nil, mCandidateResultsDTOs, fCandidateResultsDTOs, oCandidateResultsDTOs), nil
+		} else if role == 0 {
+			return mappers.ToGeneralElectionResultsDTOForStudents(election, nil, mCandidateResultsDTOs, fCandidateResultsDTOs, oCandidateResultsDTOs), nil
+		}
 	}
 
 	log.Println("Invalid role!")
