@@ -58,7 +58,7 @@ type Database interface {
 	GetElectionForAdmins(userId string, electionId string) (models.Election, []dto.GeneralParticipantDTO, []models.Candidate, error)
 	GetElectionForStudents(userId string, electionId string) (models.Election, []models.Candidate, error)
 	CastVote(userId string, electionId string, candidateId string) error
-	GetResults(userId string, role int, electionId string) (models.Election, []models.Candidate, []models.Candidate, []models.Candidate, []models.Candidate, error)
+	GetResults(userId string, role int, electionId string) (models.Election, []models.Candidate, []models.Candidate, []models.Candidate, []models.Candidate, int, error)
 }
 
 func SetUpQORAdmin(db *gorm.DB) *http.ServeMux {

@@ -594,37 +594,37 @@ func (db *postgresDatabase) CastVote(userId string, electionId string, candidate
 	return nil
 }
 
-func (db *postgresDatabase) GetResults(userId string, role int, electionId string) (models.Election, []models.Candidate, []models.Candidate, []models.Candidate, []models.Candidate, error) {
+func (db *postgresDatabase) GetResults(userId string, role int, electionId string) (models.Election, []models.Candidate, []models.Candidate, []models.Candidate, []models.Candidate, int, error) {
 	var count int
 	res := db.connection.Model(&models.Election{}).Where("election_id = ?", electionId).Count(&count)
 	if res.Error != nil {
 		log.Println(res.Error.Error())
-		return models.Election{}, nil, nil, nil, nil, res.Error
+		return models.Election{}, nil, nil, nil, nil, 0, res.Error
 	}
 	if count == 0 {
 		log.Println("Invalid Election!")
-		return models.Election{}, nil, nil, nil, nil, errors.New("Invalid Election!")
+		return models.Election{}, nil, nil, nil, nil, 0, errors.New("Invalid Election!")
 	}
 
 	if role == 0 {
 		res = db.connection.Model(&models.Participant{}).Where("user_id = ? AND election_id = ?", userId, electionId).Count(&count)
 		if res.Error != nil {
 			log.Println(res.Error.Error())
-			return models.Election{}, nil, nil, nil, nil, res.Error
+			return models.Election{}, nil, nil, nil, nil, 0, res.Error
 		}
 		if count == 0 {
 			log.Println("You are not the part of the election!")
-			return models.Election{}, nil, nil, nil, nil, errors.New("You are not the part of the election!")
+			return models.Election{}, nil, nil, nil, nil, 0, errors.New("You are not the part of the election!")
 		}
 	} else if role == 1 || role == 2 {
 		res = db.connection.Model(&models.Election{}).Where("created_by = ? AND election_id = ?", userId, electionId).Count(&count)
 		if res.Error != nil {
 			log.Println(res.Error.Error())
-			return models.Election{}, nil, nil, nil, nil, res.Error
+			return models.Election{}, nil, nil, nil, nil, 0, res.Error
 		}
 		if count == 0 {
 			log.Println("Unauthorized!")
-			return models.Election{}, nil, nil, nil, nil, errors.New("Unauthorized!")
+			return models.Election{}, nil, nil, nil, nil, 0, errors.New("Unauthorized!")
 		}
 	}
 
@@ -632,12 +632,12 @@ func (db *postgresDatabase) GetResults(userId string, role int, electionId strin
 	res = db.connection.Model(&models.Election{}).Where("election_id = ?", electionId).Find(&election)
 	if res.Error != nil {
 		log.Println(res.Error.Error())
-		return models.Election{}, nil, nil, nil, nil, res.Error
+		return models.Election{}, nil, nil, nil, nil, 0, res.Error
 	}
 
 	if !(time.Now().UTC().After(election.EndingAt.UTC())) {
 		log.Println("Election has not completed!")
-		return models.Election{}, nil, nil, nil, nil, errors.New("Election has not completed!")
+		return models.Election{}, nil, nil, nil, nil, 0, errors.New("Election has not completed!")
 	}
 
 	if !election.GenderSpecific {
@@ -645,21 +645,21 @@ func (db *postgresDatabase) GetResults(userId string, role int, electionId strin
 		res = db.connection.Model(&models.Candidate{}).Where("election_id = ? AND approved = ?", electionId, true).Find(&candidates)
 		if res.Error != nil {
 			log.Println(res.Error.Error())
-			return models.Election{}, nil, nil, nil, nil, res.Error
+			return models.Election{}, nil, nil, nil, nil, 0, res.Error
 		}
 
 		sort.Slice(candidates, func(i, j int) bool {
 			return candidates[i].Votes > candidates[j].Votes
 		})
 
-		return election, candidates, nil, nil, nil, nil
+		return election, candidates, nil, nil, nil, len(candidates), nil
 	} else {
 		//Get male candidates
 		var mCandidates []models.Candidate
 		res = db.connection.Model(&models.Candidate{}).Where("election_id = ? AND approved = ? AND sex = ?", electionId, true, 0).Order("votes desc").Find(&mCandidates)
 		if res.Error != nil {
 			log.Println(res.Error.Error())
-			return models.Election{}, nil, nil, nil, nil, res.Error
+			return models.Election{}, nil, nil, nil, nil, 0, res.Error
 		}
 
 		//Get female candidates
@@ -667,7 +667,7 @@ func (db *postgresDatabase) GetResults(userId string, role int, electionId strin
 		res = db.connection.Model(&models.Candidate{}).Where("election_id = ? AND approved = ? AND sex = ?", electionId, true, 1).Order("votes desc").Find(&fCandidates)
 		if res.Error != nil {
 			log.Println(res.Error.Error())
-			return models.Election{}, nil, nil, nil, nil, res.Error
+			return models.Election{}, nil, nil, nil, nil, 0, res.Error
 		}
 
 		//Get other candidates
@@ -675,9 +675,9 @@ func (db *postgresDatabase) GetResults(userId string, role int, electionId strin
 		res = db.connection.Model(&models.Candidate{}).Where("election_id = ? AND approved = ? AND sex = ?", electionId, true, 2).Order("votes desc").Find(&oCandidates)
 		if res.Error != nil {
 			log.Println(res.Error.Error())
-			return models.Election{}, nil, nil, nil, nil, res.Error
+			return models.Election{}, nil, nil, nil, nil, 0, res.Error
 		}
 
-		return election, nil, mCandidates, fCandidates, oCandidates, nil
+		return election, nil, mCandidates, fCandidates, oCandidates, (len(mCandidates) + len(fCandidates) + len(oCandidates)), nil
 	}
 }

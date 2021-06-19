@@ -1407,6 +1407,9 @@ var doc = `{
                 },
                 "title": {
                     "type": "string"
+                },
+                "total_votes": {
+                    "type": "integer"
                 }
             }
         },

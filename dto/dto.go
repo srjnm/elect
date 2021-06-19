@@ -170,6 +170,7 @@ type GeneralElectionResultsDTO struct {
 	EndingAt          string                  `json:"ending_at"`
 	LockingAt         string                  `json:"locking_at"`
 	GenderSpecific    bool                    `json:"gender_specific,omitempty"`
+	TotalVotes        int                     `json:"total_votes"`
 	Participants      []GeneralParticipantDTO `json:"participants,omitempty"`
 	CandidateResults  []CandidateResultsDTO   `json:"candidate_results,omitempty"`
 	MCandidateResults []CandidateResultsDTO   `json:"mcandidate_results,omitempty"`

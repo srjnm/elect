@@ -201,7 +201,7 @@ func (service *electionService) CastVote(userId string, castVoteDTO dto.CastVote
 }
 
 func (service *electionService) GetElectionResults(userId string, role int, electionId string) (dto.GeneralElectionResultsDTO, error) {
-	election, candidates, mCandidates, fCandidates, oCandidates, err := service.database.GetResults(userId, role, electionId)
+	election, candidates, mCandidates, fCandidates, oCandidates, total, err := service.database.GetResults(userId, role, electionId)
 	if err != nil {
 		return dto.GeneralElectionResultsDTO{}, err
 	}
@@ -222,9 +222,9 @@ func (service *electionService) GetElectionResults(userId string, role int, elec
 				return dto.GeneralElectionResultsDTO{}, err
 			}
 
-			return mappers.ToGeneralElectionResultsDTOForAdmins(election, generalParticipantDTOs, candidateResultsDTOs, nil, nil, nil), nil
+			return mappers.ToGeneralElectionResultsDTOForAdmins(election, generalParticipantDTOs, candidateResultsDTOs, nil, nil, nil, total), nil
 		} else if role == 0 {
-			return mappers.ToGeneralElectionResultsDTOForStudents(election, candidateResultsDTOs, nil, nil, nil), nil
+			return mappers.ToGeneralElectionResultsDTOForStudents(election, candidateResultsDTOs, nil, nil, nil, total), nil
 		}
 	} else {
 		var mCandidateResultsDTOs []dto.CandidateResultsDTO
@@ -260,9 +260,9 @@ func (service *electionService) GetElectionResults(userId string, role int, elec
 				return dto.GeneralElectionResultsDTO{}, err
 			}
 
-			return mappers.ToGeneralElectionResultsDTOForAdmins(election, generalParticipantDTOs, nil, mCandidateResultsDTOs, fCandidateResultsDTOs, oCandidateResultsDTOs), nil
+			return mappers.ToGeneralElectionResultsDTOForAdmins(election, generalParticipantDTOs, nil, mCandidateResultsDTOs, fCandidateResultsDTOs, oCandidateResultsDTOs, total), nil
 		} else if role == 0 {
-			return mappers.ToGeneralElectionResultsDTOForStudents(election, nil, mCandidateResultsDTOs, fCandidateResultsDTOs, oCandidateResultsDTOs), nil
+			return mappers.ToGeneralElectionResultsDTOForStudents(election, nil, mCandidateResultsDTOs, fCandidateResultsDTOs, oCandidateResultsDTOs, total), nil
 		}
 	}
 
