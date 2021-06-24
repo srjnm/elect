@@ -150,6 +150,7 @@ type GeneralParticipantDTO struct {
 	RegNumber     string `json:"register_number"`
 	FirstName     string `json:"first_name"`
 	LastName      string `json:"last_name"`
+	Voted         bool   `json:"voted"`
 }
 
 type GeneralElectionDTO struct {
@@ -161,19 +162,20 @@ type GeneralElectionDTO struct {
 	GenderSpecific bool                    `json:"gender_specific,omitempty"`
 	Participants   []GeneralParticipantDTO `json:"participants,omitempty"`
 	Candidates     []GeneralCandidateDTO   `json:"candidates,omitempty"`
+	Candidate      GeneralCandidateDTO     `json:"candidate,omitempty"`
 }
 
 type GeneralElectionResultsDTO struct {
-	ElectionID        string                  `json:"election_id"`
-	Title             string                  `json:"title"`
-	StartingAt        string                  `json:"starting_at"`
-	EndingAt          string                  `json:"ending_at"`
-	LockingAt         string                  `json:"locking_at"`
-	GenderSpecific    bool                    `json:"gender_specific"`
-	TotalVotes        int                     `json:"total_votes"`
-	Participants      []GeneralParticipantDTO `json:"participants,omitempty"`
-	CandidateResults  []CandidateResultsDTO   `json:"candidate_results,omitempty"`
-	MCandidateResults []CandidateResultsDTO   `json:"mcandidate_results,omitempty"`
-	FCandidateResults []CandidateResultsDTO   `json:"fcandidate_results,omitempty"`
-	OCandidateResults []CandidateResultsDTO   `json:"ocandidate_results,omitempty"`
+	ElectionID        string                `json:"election_id"`
+	Title             string                `json:"title"`
+	StartingAt        string                `json:"starting_at"`
+	EndingAt          string                `json:"ending_at"`
+	LockingAt         string                `json:"locking_at"`
+	GenderSpecific    bool                  `json:"gender_specific"`
+	TotalVotes        int                   `json:"total_votes"`
+	TotalParticipants int                   `json:"total_participants"`
+	CandidateResults  []CandidateResultsDTO `json:"candidate_results,omitempty"`
+	MCandidateResults []CandidateResultsDTO `json:"mcandidate_results,omitempty"`
+	FCandidateResults []CandidateResultsDTO `json:"fcandidate_results,omitempty"`
+	OCandidateResults []CandidateResultsDTO `json:"ocandidate_results,omitempty"`
 }

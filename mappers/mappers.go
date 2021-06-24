@@ -151,13 +151,14 @@ func ToCandidateFromCreateCandidateDTO(createCandidateDTO dto.CreateCandidateDTO
 	}
 }
 
-func ToGeneralParticipantDTOFromUser(participantId string, user models.User) dto.GeneralParticipantDTO {
+func ToGeneralParticipantDTOFromUser(participantId string, voted bool, user models.User) dto.GeneralParticipantDTO {
 	return dto.GeneralParticipantDTO{
 		ParticipantID: participantId,
 		UserID:        user.UserID.String(),
 		RegNumber:     user.RegNumber,
 		FirstName:     user.FirstName,
 		LastName:      user.LastName,
+		Voted:         voted,
 	}
 }
 
@@ -190,7 +191,7 @@ func ToGeneralElectionDTOForAdmins(election models.Election, generalParticipantD
 	}
 }
 
-func ToGeneralElectionDTOForStudents(election models.Election, generalCandidateDTOs []dto.GeneralCandidateDTO) dto.GeneralElectionDTO {
+func ToGeneralElectionDTOForStudents(election models.Election, generalCandidateDTOs []dto.GeneralCandidateDTO, generalCandidateDTO dto.GeneralCandidateDTO) dto.GeneralElectionDTO {
 	return dto.GeneralElectionDTO{
 		ElectionID:     election.ElectionID.String(),
 		Title:          election.Title,
@@ -199,10 +200,11 @@ func ToGeneralElectionDTOForStudents(election models.Election, generalCandidateD
 		LockingAt:      election.LockingAt.String(),
 		GenderSpecific: election.GenderSpecific,
 		Candidates:     generalCandidateDTOs,
+		Candidate:      generalCandidateDTO,
 	}
 }
 
-func ToGeneralElectionResultsDTOForAdmins(election models.Election, generalParticipantDTOs []dto.GeneralParticipantDTO, candidateResultsDTOs []dto.CandidateResultsDTO, mCandidateResultsDTOs []dto.CandidateResultsDTO, fCandidateResultsDTOs []dto.CandidateResultsDTO, oCandidateResultsDTOs []dto.CandidateResultsDTO, total int) dto.GeneralElectionResultsDTO {
+func ToGeneralElectionResultsDTOForAdmins(election models.Election, totalParticipants int, candidateResultsDTOs []dto.CandidateResultsDTO, mCandidateResultsDTOs []dto.CandidateResultsDTO, fCandidateResultsDTOs []dto.CandidateResultsDTO, oCandidateResultsDTOs []dto.CandidateResultsDTO, total int) dto.GeneralElectionResultsDTO {
 	return dto.GeneralElectionResultsDTO{
 		ElectionID:        election.ElectionID.String(),
 		Title:             election.Title,
@@ -211,7 +213,7 @@ func ToGeneralElectionResultsDTOForAdmins(election models.Election, generalParti
 		LockingAt:         election.LockingAt.String(),
 		GenderSpecific:    election.GenderSpecific,
 		TotalVotes:        total,
-		Participants:      generalParticipantDTOs,
+		TotalParticipants: totalParticipants,
 		CandidateResults:  candidateResultsDTOs,
 		MCandidateResults: mCandidateResultsDTOs,
 		FCandidateResults: fCandidateResultsDTOs,
@@ -219,7 +221,7 @@ func ToGeneralElectionResultsDTOForAdmins(election models.Election, generalParti
 	}
 }
 
-func ToGeneralElectionResultsDTOForStudents(election models.Election, candidateResultsDTOs []dto.CandidateResultsDTO, mCandidateResultsDTOs []dto.CandidateResultsDTO, fCandidateResultsDTOs []dto.CandidateResultsDTO, oCandidateResultsDTOs []dto.CandidateResultsDTO, total int) dto.GeneralElectionResultsDTO {
+func ToGeneralElectionResultsDTOForStudents(election models.Election, totalParticipants int, candidateResultsDTOs []dto.CandidateResultsDTO, mCandidateResultsDTOs []dto.CandidateResultsDTO, fCandidateResultsDTOs []dto.CandidateResultsDTO, oCandidateResultsDTOs []dto.CandidateResultsDTO, total int) dto.GeneralElectionResultsDTO {
 	return dto.GeneralElectionResultsDTO{
 		ElectionID:        election.ElectionID.String(),
 		Title:             election.Title,
@@ -228,6 +230,7 @@ func ToGeneralElectionResultsDTOForStudents(election models.Election, candidateR
 		LockingAt:         election.LockingAt.String(),
 		GenderSpecific:    election.GenderSpecific,
 		TotalVotes:        total,
+		TotalParticipants: totalParticipants,
 		CandidateResults:  candidateResultsDTOs,
 		MCandidateResults: mCandidateResultsDTOs,
 		FCandidateResults: fCandidateResultsDTOs,

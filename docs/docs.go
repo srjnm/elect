@@ -1325,6 +1325,9 @@ var doc = `{
         "dto.GeneralElectionDTO": {
             "type": "object",
             "properties": {
+                "candidate": {
+                    "$ref": "#/definitions/dto.GeneralCandidateDTO"
+                },
                 "candidates": {
                     "type": "array",
                     "items": {
@@ -1396,17 +1399,14 @@ var doc = `{
                         "$ref": "#/definitions/dto.CandidateResultsDTO"
                     }
                 },
-                "participants": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.GeneralParticipantDTO"
-                    }
-                },
                 "starting_at": {
                     "type": "string"
                 },
                 "title": {
                     "type": "string"
+                },
+                "total_participants": {
+                    "type": "integer"
                 },
                 "total_votes": {
                     "type": "integer"
@@ -1430,6 +1430,9 @@ var doc = `{
                 },
                 "user_id": {
                     "type": "string"
+                },
+                "voted": {
+                    "type": "boolean"
                 }
             }
         },
@@ -1567,7 +1570,7 @@ type swaggerInfo struct {
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.0",
-	Host:        "e1ect.herokuapp.com",
+	Host:        "localhost:8080",
 	BasePath:    "/",
 	Schemes:     []string{},
 	Title:       "ELECT REST API",

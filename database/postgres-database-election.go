@@ -297,10 +297,38 @@ func (db *postgresDatabase) GetElectionParticipants(userId string, electionId st
 			return nil, res.Error
 		}
 
-		generalParticipantDTOs = append(generalParticipantDTOs, mappers.ToGeneralParticipantDTOFromUser(participant.ParticipantID.String(), user))
+		generalParticipantDTOs = append(generalParticipantDTOs, mappers.ToGeneralParticipantDTOFromUser(participant.ParticipantID.String(), participant.Voted, user))
 	}
 
 	return generalParticipantDTOs, nil
+}
+
+func (db *postgresDatabase) GetTotalElectionParticipants(electionId string, userId string) (int, error) {
+	var pcount int
+	res := db.connection.Model(&models.Participant{}).Where("user_id = ? AND election_id = ?", userId, electionId).Count(&pcount)
+	if res.Error != nil {
+		log.Println(res.Error.Error())
+		return 0, res.Error
+	}
+	var ccount int
+	res = db.connection.Model(&models.Election{}).Where("election_id = ? AND created_by = ?", electionId, userId).Count(&ccount)
+	if res.Error != nil {
+		log.Println(res.Error.Error())
+		return 0, res.Error
+	}
+	if ccount == 0 && pcount == 0 {
+		log.Println("Unauthorized!")
+		return 0, errors.New("Unauthorized!")
+	}
+
+	var count int
+	res = db.connection.Model(&models.Participant{}).Where("election_id = ?", electionId).Count(&count)
+	if res.Error != nil {
+		log.Println(res.Error.Error())
+		return 0, res.Error
+	}
+
+	return count, nil
 }
 
 func (db *postgresDatabase) EnrollCandidate(candidate models.Candidate) error {
@@ -477,7 +505,7 @@ func (db *postgresDatabase) GetElectionForAdmins(userId string, electionId strin
 			return models.Election{}, nil, nil, res.Error
 		}
 
-		generalParticipantDTOs = append(generalParticipantDTOs, mappers.ToGeneralParticipantDTOFromUser(participant.ParticipantID.String(), user))
+		generalParticipantDTOs = append(generalParticipantDTOs, mappers.ToGeneralParticipantDTOFromUser(participant.ParticipantID.String(), participant.Voted, user))
 	}
 
 	var candidates []models.Candidate
@@ -490,33 +518,40 @@ func (db *postgresDatabase) GetElectionForAdmins(userId string, electionId strin
 	return election, generalParticipantDTOs, candidates, nil
 }
 
-func (db *postgresDatabase) GetElectionForStudents(userId string, electionId string) (models.Election, []models.Candidate, error) {
+func (db *postgresDatabase) GetElectionForStudents(userId string, electionId string) (models.Election, []models.Candidate, models.Candidate, error) {
 	var count int
 	res := db.connection.Model(&models.Participant{}).Where("election_id = ? AND user_id = ?", electionId, userId).Count(&count)
 	if res.Error != nil {
 		log.Println(res.Error.Error())
-		return models.Election{}, nil, res.Error
+		return models.Election{}, nil, models.Candidate{}, res.Error
 	}
 	if count == 0 {
 		log.Println("Unauthorized!")
-		return models.Election{}, nil, errors.New("Unauthorized!")
+		return models.Election{}, nil, models.Candidate{}, errors.New("Unauthorized!")
 	}
 
 	var election models.Election
 	res = db.connection.Model(&models.Election{}).Where("election_id = ?", electionId).Find(&election)
 	if res.Error != nil {
 		log.Println(res.Error.Error())
-		return models.Election{}, nil, res.Error
+		return models.Election{}, nil, models.Candidate{}, res.Error
 	}
 
 	var candidates []models.Candidate
 	res = db.connection.Model(&models.Candidate{}).Where("election_id = ? AND approved = ?", electionId, true).Find(&candidates)
 	if res.Error != nil {
 		log.Println(res.Error.Error())
-		return models.Election{}, nil, res.Error
+		return models.Election{}, nil, models.Candidate{}, res.Error
 	}
 
-	return election, candidates, nil
+	var candidate models.Candidate
+	res = db.connection.Model(&models.Candidate{}).Where("election_id = ? AND user_id = ?", electionId, userId).Find(&candidate)
+	if res.Error != nil {
+		log.Println(res.Error.Error())
+		return models.Election{}, nil, models.Candidate{}, res.Error
+	}
+
+	return election, candidates, candidate, nil
 }
 
 func (db *postgresDatabase) CastVote(userId string, electionId string, candidateId string) error {

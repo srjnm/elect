@@ -153,10 +153,13 @@
             $(CLASS_TAB_CONTENT).show().html($content).trigger('enable');
 
           },
-          error: function () {
+          error: function (data) {
             $('.qor-layout__tab-spinner').remove();
             $body.data('tabScopeActive',tabScopeActive);
-          }
+          },
+          complete: function(xhr, textStatus) {
+            console.log(xhr.status);
+          } 
         });
       return false;
     },

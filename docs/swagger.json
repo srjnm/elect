@@ -9,7 +9,7 @@
         },
         "version": "1.0"
     },
-    "host": "e1ect.herokuapp.com",
+    "host": "localhost:8080",
     "basePath": "/",
     "paths": {
         "/api/candidate": {
@@ -1310,6 +1310,9 @@
         "dto.GeneralElectionDTO": {
             "type": "object",
             "properties": {
+                "candidate": {
+                    "$ref": "#/definitions/dto.GeneralCandidateDTO"
+                },
                 "candidates": {
                     "type": "array",
                     "items": {
@@ -1381,17 +1384,14 @@
                         "$ref": "#/definitions/dto.CandidateResultsDTO"
                     }
                 },
-                "participants": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.GeneralParticipantDTO"
-                    }
-                },
                 "starting_at": {
                     "type": "string"
                 },
                 "title": {
                     "type": "string"
+                },
+                "total_participants": {
+                    "type": "integer"
                 },
                 "total_votes": {
                     "type": "integer"
@@ -1415,6 +1415,9 @@
                 },
                 "user_id": {
                     "type": "string"
+                },
+                "voted": {
+                    "type": "boolean"
                 }
             }
         },

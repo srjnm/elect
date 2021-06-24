@@ -27,7 +27,7 @@ import (
 // @contact.name ELECT API Support
 // @contact.email surajnm15@gmail.com
 
-// @host e1ect.herokuapp.com
+// @host localhost:8080
 // @BasePath /
 func main() {
 	var port string
