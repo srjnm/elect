@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/biezhi/gorm-paginator/pagination"
+	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -537,26 +538,27 @@ func (db *postgresDatabase) GetElectionForStudents(userId string, electionId str
 		return models.Election{}, nil, models.Candidate{}, false, res.Error
 	}
 
-	res = db.connection.Model(&models.Candidate{}).Where("election_id = ? AND approved = ?", electionId, true).Count(&count)
+	var candidates []models.Candidate
+	res = db.connection.Model(&models.Candidate{}).Where("election_id = ? AND approved = ?", electionId, true).Find(&candidates)
 	if res.Error != nil {
 		log.Println(res.Error.Error())
 		return models.Election{}, nil, models.Candidate{}, false, res.Error
-	}
-
-	var candidates []models.Candidate
-	if count > 0 {
-		res = db.connection.Model(&models.Candidate{}).Where("election_id = ? AND approved = ?", electionId, true).Find(&candidates)
-		if res.Error != nil {
-			log.Println(res.Error.Error())
-			return models.Election{}, nil, models.Candidate{}, false, res.Error
-		}
 	}
 
 	var candidate models.Candidate
-	res = db.connection.Model(&models.Candidate{}).Where("election_id = ? AND user_id = ?", electionId, userId).Find(&candidate)
-	if res.Error != nil {
+	var ccount int
+	res = db.connection.Model(&models.Candidate{}).Where("election_id = ? AND user_id = ?", electionId, userId).Count(&ccount)
+	if res.Error != nil && !errors.Is(res.Error, gorm.ErrRecordNotFound) {
 		log.Println(res.Error.Error())
 		return models.Election{}, nil, models.Candidate{}, false, res.Error
+	} else {
+		if ccount > 0 {
+			res = db.connection.Model(&models.Candidate{}).Where("election_id = ? AND user_id = ?", electionId, userId).Find(&candidate)
+			if res.Error != nil {
+				log.Println(res.Error.Error())
+				return models.Election{}, nil, models.Candidate{}, false, res.Error
+			}
+		}
 	}
 
 	var participant models.Participant

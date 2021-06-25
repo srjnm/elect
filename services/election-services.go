@@ -193,11 +193,14 @@ func (service *electionService) GetElectionForStudents(userId string, electionId
 		generalCandidateDTOs = append(generalCandidateDTOs, mappers.ToGeneralCandidateDTOFromCandidate(candidate, user))
 	}
 
-	user, err := service.database.GetUser(candidate.UserID.String())
-	if err != nil {
-		return dto.GeneralElectionDTO{}, err
+	var generalCandidateDTO dto.GeneralCandidateDTO
+	if candidate.CandidateID != uuid.Nil {
+		user, err := service.database.GetUser(candidate.UserID.String())
+		if err != nil {
+			return dto.GeneralElectionDTO{}, err
+		}
+		generalCandidateDTO = mappers.ToGeneralCandidateDTOFromCandidate(candidate, user)
 	}
-	generalCandidateDTO := mappers.ToGeneralCandidateDTOFromCandidate(candidate, user)
 
 	return mappers.ToGeneralElectionDTOForStudents(election, generalCandidateDTOs, generalCandidateDTO, voted), nil
 }
