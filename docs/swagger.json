@@ -9,7 +9,7 @@
         },
         "version": "1.0"
     },
-    "host": "e1ect.herokuapp.com",
+    "host": "localhost:8080",
     "basePath": "/",
     "paths": {
         "/api/candidate": {

@@ -284,7 +284,7 @@ definitions:
     - password
     - token
     type: object
-host: e1ect.herokuapp.com
+host: localhost:8080
 info:
   contact:
     email: surajnm15@gmail.com
