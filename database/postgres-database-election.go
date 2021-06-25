@@ -537,11 +537,19 @@ func (db *postgresDatabase) GetElectionForStudents(userId string, electionId str
 		return models.Election{}, nil, models.Candidate{}, false, res.Error
 	}
 
-	var candidates []models.Candidate
-	res = db.connection.Model(&models.Candidate{}).Where("election_id = ? AND approved = ?", electionId, true).Find(&candidates)
+	res = db.connection.Model(&models.Candidate{}).Where("election_id = ? AND approved = ?", electionId, true).Count(&count)
 	if res.Error != nil {
 		log.Println(res.Error.Error())
 		return models.Election{}, nil, models.Candidate{}, false, res.Error
+	}
+
+	var candidates []models.Candidate
+	if count > 0 {
+		res = db.connection.Model(&models.Candidate{}).Where("election_id = ? AND approved = ?", electionId, true).Find(&candidates)
+		if res.Error != nil {
+			log.Println(res.Error.Error())
+			return models.Election{}, nil, models.Candidate{}, false, res.Error
+		}
 	}
 
 	var candidate models.Candidate
