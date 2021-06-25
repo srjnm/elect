@@ -57,7 +57,7 @@ type Database interface {
 	ApproveCandidate(userId string, candidateId string) error
 	UnapproveCandidate(userId string, candidateId string) error
 	GetElectionForAdmins(userId string, electionId string) (models.Election, []dto.GeneralParticipantDTO, []models.Candidate, error)
-	GetElectionForStudents(userId string, electionId string) (models.Election, []models.Candidate, models.Candidate, error)
+	GetElectionForStudents(userId string, electionId string) (models.Election, []models.Candidate, models.Candidate, bool, error)
 	CastVote(userId string, electionId string, candidateId string) error
 	GetResults(userId string, role int, electionId string) (models.Election, []models.Candidate, []models.Candidate, []models.Candidate, []models.Candidate, int, error)
 }

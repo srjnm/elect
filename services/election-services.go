@@ -178,7 +178,7 @@ func (service *electionService) GetElectionForAdmins(userId string, electionId s
 }
 
 func (service *electionService) GetElectionForStudents(userId string, electionId string) (dto.GeneralElectionDTO, error) {
-	election, candidates, candidate, err := service.database.GetElectionForStudents(userId, electionId)
+	election, candidates, candidate, voted, err := service.database.GetElectionForStudents(userId, electionId)
 	if err != nil {
 		return dto.GeneralElectionDTO{}, err
 	}
@@ -199,7 +199,7 @@ func (service *electionService) GetElectionForStudents(userId string, electionId
 	}
 	generalCandidateDTO := mappers.ToGeneralCandidateDTOFromCandidate(candidate, user)
 
-	return mappers.ToGeneralElectionDTOForStudents(election, generalCandidateDTOs, generalCandidateDTO), nil
+	return mappers.ToGeneralElectionDTOForStudents(election, generalCandidateDTOs, generalCandidateDTO, voted), nil
 }
 
 func (service *electionService) CastVote(userId string, castVoteDTO dto.CastVoteDTO) error {

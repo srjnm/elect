@@ -191,7 +191,7 @@ func ToGeneralElectionDTOForAdmins(election models.Election, generalParticipantD
 	}
 }
 
-func ToGeneralElectionDTOForStudents(election models.Election, generalCandidateDTOs []dto.GeneralCandidateDTO, generalCandidateDTO dto.GeneralCandidateDTO) dto.GeneralElectionDTO {
+func ToGeneralElectionDTOForStudents(election models.Election, generalCandidateDTOs []dto.GeneralCandidateDTO, generalCandidateDTO dto.GeneralCandidateDTO, voted bool) dto.GeneralElectionDTO {
 	return dto.GeneralElectionDTO{
 		ElectionID:     election.ElectionID.String(),
 		Title:          election.Title,
@@ -199,6 +199,7 @@ func ToGeneralElectionDTOForStudents(election models.Election, generalCandidateD
 		EndingAt:       election.EndingAt.String(),
 		LockingAt:      election.LockingAt.String(),
 		GenderSpecific: election.GenderSpecific,
+		Voted:          voted,
 		Candidates:     generalCandidateDTOs,
 		Candidate:      generalCandidateDTO,
 	}
