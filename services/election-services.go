@@ -199,7 +199,7 @@ func (service *electionService) GetElectionForStudents(userId string, electionId
 		if err != nil {
 			return dto.GeneralElectionDTO{}, err
 		}
-		generalCandidateDTO = mappers.ToGeneralCandidateDTOFromCandidate(candidate, user)
+		generalCandidateDTO = mappers.ToGeneralCandidateDTOFromCandidateForStudents(candidate, user)
 	}
 
 	return mappers.ToGeneralElectionDTOForStudents(election, generalCandidateDTOs, generalCandidateDTO, voted), nil

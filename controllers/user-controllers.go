@@ -477,7 +477,45 @@ func (controller *userController) ChangePassword(cxt *gin.Context) error {
 		return err
 	}
 
-	return controller.userService.ChangePassword(userId, changePasswordDTO)
+	err = controller.userService.ChangePassword(userId, changePasswordDTO)
+	if err != nil {
+		return err
+	}
+
+	user, err := controller.userService.GetUserByID(userId)
+	if err != nil {
+		return err
+	}
+
+	dbUser, err := controller.userService.GetUserForAuth(user.Email)
+
+	newValue := map[string]string{
+		"access_token":  controller.jwtService.GenerateToken(dbUser, user.Role),
+		"refresh_token": controller.jwtService.GenerateRefreshToken(dbUser),
+	}
+
+	if encoded, err := s.Encode("tokens", newValue); err == nil {
+		http.SetCookie(
+			cxt.Writer,
+			&http.Cookie{
+				Name:     "token",
+				Value:    encoded,
+				MaxAge:   3600 * 24 * 7,
+				Path:     "/",
+				Domain:   "",
+				Secure:   true,
+				HttpOnly: true,
+				SameSite: http.SameSiteNoneMode,
+			},
+		)
+	}
+
+	err = controller.userService.SetActiveRefreshToken(value["refresh_token"], dbUser.Email)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (controller *userController) CheckVerifyTokenValidity(cxt *gin.Context) error {

@@ -62,7 +62,7 @@ type Database interface {
 	GetResults(userId string, role int, electionId string) (models.Election, []models.Candidate, []models.Candidate, []models.Candidate, []models.Candidate, int, error)
 }
 
-func SetUpQORAdmin(db *gorm.DB) *http.ServeMux {
+func SetUpQORAdmin(db *gorm.DB) (*http.ServeMux, *admin.Admin) {
 	adm := admin.New(&admin.AdminConfig{SiteName: "ELECT", DB: db})
 	mux := http.NewServeMux()
 	adm.MountTo("/admin", mux)
@@ -254,5 +254,5 @@ func SetUpQORAdmin(db *gorm.DB) *http.ServeMux {
 
 	validations.RegisterCallbacks(db)
 
-	return mux
+	return mux, adm
 }

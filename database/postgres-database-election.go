@@ -704,14 +704,25 @@ func (db *postgresDatabase) GetResults(userId string, role int, electionId strin
 			return candidates[i].Votes > candidates[j].Votes
 		})
 
-		return election, candidates, nil, nil, nil, len(candidates), nil
+		total := 0
+		for _, candidate := range candidates {
+			total += candidate.Votes
+		}
+
+		return election, candidates, nil, nil, nil, total, nil
 	} else {
+		total := 0
+
 		//Get male candidates
 		var mCandidates []models.Candidate
 		res = db.connection.Model(&models.Candidate{}).Where("election_id = ? AND approved = ? AND sex = ?", electionId, true, 0).Order("votes desc").Find(&mCandidates)
 		if res.Error != nil {
 			log.Println(res.Error.Error())
 			return models.Election{}, nil, nil, nil, nil, 0, res.Error
+		}
+
+		for _, candidate := range mCandidates {
+			total += candidate.Votes
 		}
 
 		//Get female candidates
@@ -722,6 +733,10 @@ func (db *postgresDatabase) GetResults(userId string, role int, electionId strin
 			return models.Election{}, nil, nil, nil, nil, 0, res.Error
 		}
 
+		for _, candidate := range fCandidates {
+			total += candidate.Votes
+		}
+
 		//Get other candidates
 		var oCandidates []models.Candidate
 		res = db.connection.Model(&models.Candidate{}).Where("election_id = ? AND approved = ? AND sex = ?", electionId, true, 2).Order("votes desc").Find(&oCandidates)
@@ -730,6 +745,10 @@ func (db *postgresDatabase) GetResults(userId string, role int, electionId strin
 			return models.Election{}, nil, nil, nil, nil, 0, res.Error
 		}
 
-		return election, nil, mCandidates, fCandidates, oCandidates, (len(mCandidates) + len(fCandidates) + len(oCandidates)), nil
+		for _, candidate := range oCandidates {
+			total += candidate.Votes
+		}
+
+		return election, nil, mCandidates, fCandidates, oCandidates, total, nil
 	}
 }

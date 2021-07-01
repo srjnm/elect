@@ -140,7 +140,7 @@ type GeneralCandidateDTO struct {
 	Sex            int    `json:"sex"`
 	DisplayPicture string `json:"display_picture"`
 	Poster         string `json:"poster"`
-	IDProof        string `json:"id_proof"`
+	IDProof        string `json:"id_proof,omitempty"`
 	Approved       bool   `json:"approved"`
 }
 
@@ -163,7 +163,7 @@ type GeneralElectionDTO struct {
 	GenderSpecific bool                    `json:"gender_specific,omitempty"`
 	Participants   []GeneralParticipantDTO `json:"participants,omitempty"`
 	Candidates     []GeneralCandidateDTO   `json:"candidates,omitempty"`
-	Candidate      GeneralCandidateDTO     `json:"candidate,omitempty"`
+	Candidate      *GeneralCandidateDTO    `json:"candidate,omitempty"`
 }
 
 type GeneralElectionResultsDTO struct {

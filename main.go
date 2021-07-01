@@ -46,7 +46,7 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 
 	//Declaring all layers
-	postgresDatabase, mux := database.NewPostgresDatabase()
+	postgresDatabase, mux, admin := database.NewPostgresDatabase()
 	userService := services.NewUserService(postgresDatabase)
 	electionService := services.NewElectionService(postgresDatabase)
 	jwtService := services.NewJWTService("e1ect.herokuapp.com", postgresDatabase)
@@ -141,6 +141,7 @@ func main() {
 	server.GET("/swagger/*any", middlewares.Authorizer(jwtService, authEnforcer), ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
 	//QOR Admin Endpoint Integration
+	admin.GetRouter().Use(middlewares.AdminMiddleware(jwtService)) // Setting up middleware
 	server.Any("/admin/*resources", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), gin.WrapH(mux))
 
 	server.Run(":" + port)

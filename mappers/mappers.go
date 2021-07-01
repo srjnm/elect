@@ -178,6 +178,21 @@ func ToGeneralCandidateDTOFromCandidate(candidate models.Candidate, user models.
 	}
 }
 
+func ToGeneralCandidateDTOFromCandidateForStudents(candidate models.Candidate, user models.User) dto.GeneralCandidateDTO {
+	return dto.GeneralCandidateDTO{
+		CandidateID:    candidate.CandidateID.String(),
+		UserID:         candidate.UserID.String(),
+		ElectionID:     candidate.ElectionID.String(),
+		RegisterNo:     user.RegNumber,
+		FirstName:      user.FirstName,
+		LastName:       user.LastName,
+		Sex:            candidate.Sex,
+		DisplayPicture: candidate.DisplayPicture,
+		Poster:         candidate.Poster,
+		Approved:       candidate.Approved,
+	}
+}
+
 func ToGeneralElectionDTOForAdmins(election models.Election, generalParticipantDTOs []dto.GeneralParticipantDTO, generalCandidateDTOs []dto.GeneralCandidateDTO) dto.GeneralElectionDTO {
 	return dto.GeneralElectionDTO{
 		ElectionID:     election.ElectionID.String(),
@@ -201,7 +216,7 @@ func ToGeneralElectionDTOForStudents(election models.Election, generalCandidateD
 		GenderSpecific: election.GenderSpecific,
 		Voted:          voted,
 		Candidates:     generalCandidateDTOs,
-		Candidate:      generalCandidateDTO,
+		Candidate:      &generalCandidateDTO,
 	}
 }
 
