@@ -47,7 +47,12 @@ func (service *userService) GetUserForAuth(email string) (dto.AuthUserDTO, error
 }
 
 func (service *userService) GetUserByID(userID string) (dto.GeneralUserDTO, error) {
-	return service.GetUserByID(userID)
+	user, err := service.database.GetUser(userID)
+	if err != nil {
+		return dto.GeneralUserDTO{}, err
+	}
+
+	return mappers.ToGeneralUserDTO(user), nil
 }
 
 func (service *userService) GetUserRole(email string) (int, error) {
