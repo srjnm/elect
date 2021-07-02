@@ -106,7 +106,7 @@ func (service *electionService) GetElectionsForAdmins(userId string, paginatorPa
 
 	var generalElectionsDTO []dto.GeneralElectionDTO
 	for _, election := range elections {
-		generalElectionsDTO = append(generalElectionsDTO, mappers.ToGeneralElectionDTOFromElection(election))
+		generalElectionsDTO = append(generalElectionsDTO, mappers.ToGeneralElectionDTOFromElection(election, false))
 	}
 
 	return generalElectionsDTO, nil
@@ -114,22 +114,23 @@ func (service *electionService) GetElectionsForAdmins(userId string, paginatorPa
 
 func (service *electionService) GetElectionsForStudents(userId string, paginatorParams dto.PaginatorParams) ([]dto.GeneralElectionDTO, error) {
 	var elections []models.Election
+	var voted []bool
 	var err error
 	if paginatorParams.Page == "" {
-		elections, err = service.database.GetElectionsForStudents(userId, dto.PaginatorParams{})
+		elections, voted, err = service.database.GetElectionsForStudents(userId, dto.PaginatorParams{})
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		elections, err = service.database.GetElectionsForStudents(userId, paginatorParams)
+		elections, voted, err = service.database.GetElectionsForStudents(userId, paginatorParams)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	var generalElectionsDTO []dto.GeneralElectionDTO
-	for _, election := range elections {
-		generalElectionsDTO = append(generalElectionsDTO, mappers.ToGeneralElectionDTOFromElection(election))
+	for i, election := range elections {
+		generalElectionsDTO = append(generalElectionsDTO, mappers.ToGeneralElectionDTOFromElection(election, voted[i]))
 	}
 
 	return generalElectionsDTO, nil

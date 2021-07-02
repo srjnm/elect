@@ -103,6 +103,8 @@ definitions:
         type: string
       title:
         type: string
+      voted:
+        type: boolean
     type: object
   dto.GeneralCandidateDTO:
     properties:

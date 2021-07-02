@@ -51,7 +51,7 @@ type Database interface {
 	GetElectionParticipants(userId string, electionId string) ([]dto.GeneralParticipantDTO, error)
 	GetTotalElectionParticipants(electionId string, userId string) (int, error)
 	GetElectionsForAdmins(userId string, paginatorParams dto.PaginatorParams) ([]models.Election, error)
-	GetElectionsForStudents(userId string, paginatorParams dto.PaginatorParams) ([]models.Election, error)
+	GetElectionsForStudents(userId string, paginatorParams dto.PaginatorParams) ([]models.Election, []bool, error)
 	EnrollCandidate(candidate models.Candidate) error
 	CheckCandidateEligibility(userId string, electionId string) error
 	ApproveCandidate(userId string, candidateId string) error

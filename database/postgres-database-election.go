@@ -189,28 +189,30 @@ func (db *postgresDatabase) GetElectionsForAdmins(userId string, paginatorParams
 	return elections, nil
 }
 
-func (db *postgresDatabase) GetElectionsForStudents(userId string, paginatorParams dto.PaginatorParams) ([]models.Election, error) {
+func (db *postgresDatabase) GetElectionsForStudents(userId string, paginatorParams dto.PaginatorParams) ([]models.Election, []bool, error) {
 	var electionIds []models.Participant
 	res := db.connection.Model(&models.Participant{}).Where("user_id = ?", userId).Order("created_at DESC").Find(&electionIds)
 	if res.Error != nil {
 		log.Println(res.Error.Error())
-		return nil, res.Error
+		return nil, nil, res.Error
 	}
 
 	var elections []models.Election
+	var voted []bool
 	if paginatorParams.Page == "" {
 		for _, eId := range electionIds {
 			var election models.Election
 			res := db.connection.Model(&models.Election{}).Where("election_id = ?", eId.ElectionID.String()).First(&election)
 			if res.Error != nil {
 				log.Println(res.Error.Error())
-				return nil, res.Error
+				return nil, nil, res.Error
 			}
 
 			elections = append(elections, election)
+			voted = append(voted, eId.Voted)
 		}
 
-		return elections, nil
+		return elections, voted, nil
 	}
 
 	var electIdS []string
@@ -233,7 +235,16 @@ func (db *postgresDatabase) GetElectionsForStudents(userId string, paginatorPara
 		&elections,
 	)
 
-	return elections, nil
+	for _, election := range elections {
+		for _, eId := range electionIds {
+			if election.ElectionID.String() == eId.ElectionID.String() {
+				voted = append(voted, eId.Voted)
+				break
+			}
+		}
+	}
+
+	return elections, voted, nil
 }
 
 func (db *postgresDatabase) DeleteParticipant(userId string, electionId string, participantId string) error {

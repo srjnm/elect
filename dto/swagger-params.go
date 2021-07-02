@@ -22,6 +22,7 @@ type Elections struct {
 	EndingAt       string `json:"ending_at"`
 	LockingAt      string `json:"locking_at"`
 	GenderSpecific bool   `json:"gender_specific,omitempty"`
+	Voted          bool   `json:"voted,omitempty"`
 }
 
 type CandidateInputs struct {

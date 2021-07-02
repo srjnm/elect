@@ -130,7 +130,7 @@ func ToElectionFromEditElectionDTO(editElectionDTO dto.EditElectionDTO) models.E
 	}
 }
 
-func ToGeneralElectionDTOFromElection(election models.Election) dto.GeneralElectionDTO {
+func ToGeneralElectionDTOFromElection(election models.Election, voted bool) dto.GeneralElectionDTO {
 	return dto.GeneralElectionDTO{
 		ElectionID:     election.ElectionID.String(),
 		Title:          election.Title,
@@ -138,6 +138,7 @@ func ToGeneralElectionDTOFromElection(election models.Election) dto.GeneralElect
 		EndingAt:       election.EndingAt.String(),
 		LockingAt:      election.LockingAt.String(),
 		GenderSpecific: election.GenderSpecific,
+		Voted:          voted,
 	}
 }
 

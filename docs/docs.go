@@ -1281,6 +1281,9 @@ var doc = `{
                 },
                 "title": {
                     "type": "string"
+                },
+                "voted": {
+                    "type": "boolean"
                 }
             }
         },
