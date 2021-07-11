@@ -1,6 +1,7 @@
 package models
 
 import (
+	"log"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -28,6 +29,31 @@ type User struct {
 	Base
 }
 
+func (user *User) AfterDelete(db *gorm.DB) error {
+	err := db.Model(&Participant{}).Where("user_id = ?", user.UserID.String()).Delete(&Participant{}).Error
+	if err != nil {
+		log.Println("gorm:")
+		log.Println(err)
+		return err
+	}
+
+	err = db.Model(&Candidate{}).Where("user_id = ?", user.UserID.String()).Delete(&Candidate{}).Error
+	if err != nil {
+		log.Println("gorm:")
+		log.Println(err)
+		return err
+	}
+
+	err = db.Model(&Blacklist{}).Where("user_id = ?", user.UserID.String()).Delete(&Blacklist{}).Error
+	if err != nil {
+		log.Println("gorm:")
+		log.Println(err)
+		return err
+	}
+
+	return nil
+}
+
 type Election struct {
 	ElectionID     uuid.UUID `gorm:"primary_key; type:uuid; default:uuid_generate_v4()"`
 	Title          string    `gorm:"not null"`
@@ -37,6 +63,24 @@ type Election struct {
 	GenderSpecific bool      `gorm:"not null; default:false"`
 	CreatedBy      string    `gorm:"not null"`
 	Base
+}
+
+func (election *Election) AfterDelete(db *gorm.DB) error {
+	err := db.Model(&Participant{}).Where("election_id = ?", election.ElectionID.String()).Delete(&Participant{}).Error
+	if err != nil {
+		log.Println("gorm:")
+		log.Println(err)
+		return err
+	}
+
+	err = db.Model(&Candidate{}).Where("election_id = ?", election.ElectionID.String()).Delete(&Candidate{}).Error
+	if err != nil {
+		log.Println("gorm:")
+		log.Println(err)
+		return err
+	}
+
+	return nil
 }
 
 type Participant struct {

@@ -70,8 +70,9 @@ func SetUpQORAdmin(db *gorm.DB) *http.ServeMux {
 
 	// User Management
 	usr := adm.AddResource(models.User{}, &admin.Config{Menu: []string{"User Management"}})
+	usr.SearchAttrs("UserID", "RegNumber", "Email", "FirstName")
 	usr.IndexAttrs("-Password", "-VerifyToken", "-ActiveRefreshToken")
-	usr.NewAttrs("-Password", "-ActiveRefreshToken", "-RegisteredBy")
+	usr.NewAttrs("-Password", "-ActiveRefreshToken", "-RegisteredBy", "-Verified")
 	usr.EditAttrs("-VerifyToken", "-ActiveRefreshToken", "-RegisteredBy")
 	usr.Meta(&admin.Meta{
 		Name: "Password",

@@ -80,10 +80,10 @@ func (db *postgresDatabase) DeleteElection(userId string, electionId string) err
 		return res.Error
 	}
 
-	if findElection.LockingAt.UTC().Before(time.Now().UTC()) {
-		log.Println("Election Locked!")
-		return errors.New("Election Locked!")
-	}
+	// if findElection.LockingAt.UTC().Before(time.Now().UTC()) {
+	// 	log.Println("Election Locked!")
+	// 	return errors.New("Election Locked!")
+	// }
 
 	res = db.connection.Model(&models.Election{}).Where("election_id = ?", electionId).Delete(&models.Election{ElectionID: uuid.FromStringOrNil(electionId)})
 	if res.Error != nil {
