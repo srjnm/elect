@@ -13,9 +13,13 @@ import (
 	_ "elect/docs"
 
 	"github.com/casbin/casbin/v2"
+	"github.com/gin-contrib/static"
+
+	//"github.com/gin-gonic/contrib/secure"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	cors "github.com/rs/cors/wrapper/gin"
+
+	//cors "github.com/rs/cors/wrapper/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -27,7 +31,7 @@ import (
 // @contact.name ELECT API Support
 // @contact.email surajnm15@gmail.com
 
-// @host localhost:8080
+// @host e1ect.herokuapp.com
 // @BasePath /
 func main() {
 	var port string
@@ -46,7 +50,7 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 
 	//Declaring all layers
-	postgresDatabase, mux, admin := database.NewPostgresDatabase()
+	postgresDatabase, mux := database.NewPostgresDatabase()
 	userService := services.NewUserService(postgresDatabase)
 	electionService := services.NewElectionService(postgresDatabase)
 	jwtService := services.NewJWTService("e1ect.herokuapp.com", postgresDatabase)
@@ -58,40 +62,64 @@ func main() {
 
 	port = os.Getenv("PORT")
 
-	config := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:8000", "http://localhost:3000", "http://localhost:8080", "https://e1ect.herokuapp.com/", "http://192.168.1.248:3000"},
-		AllowCredentials: true,
-		ExposedHeaders:   []string{"Set-Cookie"},
-		AllowedMethods:   []string{"POST", "OPTIONS", "GET", "PUT", "DELETE"},
-	})
+	// config := cors.New(cors.Options{
+	// 	AllowedOrigins:   []string{"http://localhost:8000", "http://localhost:3000", "http://localhost:8080", "https://e1ect.herokuapp.com/", "http://192.168.1.248:3000"},
+	// 	AllowCredentials: true,
+	// 	ExposedHeaders:   []string{"Set-Cookie"},
+	// 	AllowedMethods:   []string{"POST", "OPTIONS", "GET", "PUT", "DELETE"},
+	// })
 
 	server := gin.Default()
-	server.Use(config)
+	//server.Use(config)
+	// server.Use(secure.Secure(secure.Options{
+	// 	SSLRedirect: true,
+	// }))
 
 	//Setting up the templates
-	server.Static("/assets", "./templates/assets")
-	server.LoadHTMLGlob("templates/html/*.html")
+	server.Static("/static", "./web/static")
+	server.LoadHTMLGlob("./web/*.html")
+
+	//React routes
+	server.Use(static.Serve("/", static.LocalFile("./web", true)))
+	server.Use(static.Serve("/admin", static.LocalFile("./web", true)))
+	server.Use(static.Serve("/student", static.LocalFile("./web", true)))
+	server.Use(static.Serve("/edit", static.LocalFile("./web", true)))
+	server.Use(static.Serve("/view", static.LocalFile("./web", true)))
+	server.Use(static.Serve("/result", static.LocalFile("./web", true)))
+	server.Use(static.Serve("/candidate", static.LocalFile("./web", true)))
+	server.Use(static.Serve("/preview", static.LocalFile("./web", true)))
+	server.Use(static.Serve("/vote", static.LocalFile("./web", true)))
+	server.Use(static.Serve("/logout", static.LocalFile("./web", true)))
+	server.Use(static.Serve("/404", static.LocalFile("./web", true)))
 
 	//Login
 	server.POST("/login", middlewares.Authorizer(jwtService, authEnforcer), authAPI.LoginHandler)
 	//Logout
-	server.POST("/logout", middlewares.Authorizer(jwtService, authEnforcer), authAPI.LogoutHandler)
+	server.POST("/ulogout", middlewares.Authorizer(jwtService, authEnforcer), authAPI.LogoutHandler)
+	//Logout for Super Admin
+	server.POST("/slogout", middlewares.SuperAdminLogoutMiddleware(jwtService), authAPI.LogoutHandler)
 	//Refresh
 	server.POST("/refresh", middlewares.EnsureValidity(jwtService), authAPI.RefreshHandler)
 	//VerifyFrontEnd
-	server.GET("/verify/:token", middlewares.Authorizer(jwtService, authEnforcer), authAPI.VerifyGETHandler)
+	server.GET("/verify/:token", func(cxt *gin.Context) {
+		cxt.HTML(http.StatusOK, "index.html", nil)
+	})
 	//Check Verify Token Validity
 	server.POST("/verifytoken/:token", middlewares.Authorizer(jwtService, authEnforcer), authAPI.CheckVerifyTokenValidityHandler)
 	//Verify Account
 	server.POST("/setpassword", middlewares.Authorizer(jwtService, authEnforcer), authAPI.VerifyHandler)
 	//OTP Verification FrontEnd
-	server.GET("/otp", middlewares.Authorizer(jwtService, authEnforcer), authAPI.OTPGETHandler)
+	//server.GET("/otp", middlewares.Authorizer(jwtService, authEnforcer), authAPI.OTPGETHandler)
 	//OTP Verification
 	server.POST("/otp", middlewares.Authorizer(jwtService, authEnforcer), authAPI.OTPHandler)
 	//Change Password
 	server.POST("/changepassword", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), authAPI.ChangePasswordHandler)
 	//Reset Password
 	server.POST("/resetpassword", middlewares.Authorizer(jwtService, authEnforcer), authAPI.ResetPasswordHandler)
+	//Reset Password FrontEnd
+	server.GET("/resetpassword/:token", func(cxt *gin.Context) {
+		cxt.HTML(http.StatusOK, "index.html", nil)
+	})
 	//Create Reset Token
 	server.POST("/createresettoken", middlewares.Authorizer(jwtService, authEnforcer), authAPI.CreateResetTokenHandler)
 	//Check Reset Token Validity
@@ -99,7 +127,7 @@ func main() {
 
 	apiRoutes := server.Group("/api")
 	//Register Students
-	apiRoutes.POST("/registerstudents", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), userAPI.RegisterStudentsHandler)
+	apiRoutes.POST("/registerstudents", middlewares.MultipartMiddleware(), middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), userAPI.RegisterStudentsHandler)
 	//Registered Students
 	apiRoutes.GET("/registeredstudents", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), userAPI.RegisteredStudentsHandler)
 	//Delete Registered Student
@@ -116,11 +144,11 @@ func main() {
 	//Delete Election
 	apiRoutes.DELETE("/election/:id", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.DeleteElectionHandler)
 	//Add Participants
-	apiRoutes.POST("/participants/:id", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.AddParticipantsHandler)
+	apiRoutes.POST("/participants/:id", middlewares.MultipartMiddleware(), middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.AddParticipantsHandler)
 	//Delete Participant
 	apiRoutes.DELETE("/participant", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.DeleteParticipantHandler)
 	//Enroll Candidate
-	apiRoutes.POST("/candidate", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.EnrollCandidateHandler)
+	apiRoutes.POST("/candidate", middlewares.MultipartMiddleware(), middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.EnrollCandidateHandler)
 	//Approve Candidate
 	apiRoutes.POST("/candidate/approve/:id", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), electionAPI.ApproveCandidateHandler)
 	//Unapprove Candidate
@@ -141,8 +169,11 @@ func main() {
 	server.GET("/swagger/*any", middlewares.Authorizer(jwtService, authEnforcer), ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
 	//QOR Admin Endpoint Integration
-	admin.GetRouter().Use(middlewares.AdminMiddleware(jwtService)) // Setting up middleware
-	server.Any("/admin/*resources", middlewares.Authorizer(jwtService, authEnforcer), middlewares.Authorization(jwtService), gin.WrapH(mux))
+	server.Any("/superadmin/*resources", middlewares.SuperAdminMiddleware(jwtService), gin.WrapH(mux))
+
+	server.NoRoute(func(cxt *gin.Context) {
+		cxt.Redirect(http.StatusPermanentRedirect, "/404")
+	})
 
 	server.Run(":" + port)
 }

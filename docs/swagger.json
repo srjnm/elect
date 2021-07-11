@@ -9,7 +9,7 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:8080",
+    "host": "e1ect.herokuapp.com",
     "basePath": "/",
     "paths": {
         "/api/candidate": {
@@ -833,39 +833,6 @@
                 }
             }
         },
-        "/logout": {
-            "post": {
-                "description": "A user has to be logged in currently to access this endpoint.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "User Logout",
-                "operationId": "logout",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/otp": {
             "post": {
                 "produces": [
@@ -1069,6 +1036,39 @@
                 }
             }
         },
+        "/ulogout": {
+            "post": {
+                "description": "A user has to be logged in currently to access this endpoint.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "User Logout",
+                "operationId": "logout",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/verifytoken/{token}": {
             "post": {
                 "produces": [
@@ -1249,6 +1249,9 @@
         "dto.Elections": {
             "type": "object",
             "properties": {
+                "blacklisted": {
+                    "type": "boolean"
+                },
                 "election_id": {
                     "type": "string"
                 },
@@ -1313,6 +1316,9 @@
         "dto.GeneralElectionDTO": {
             "type": "object",
             "properties": {
+                "blacklisted": {
+                    "type": "boolean"
+                },
                 "candidate": {
                     "$ref": "#/definitions/dto.GeneralCandidateDTO"
                 },

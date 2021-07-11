@@ -180,7 +180,9 @@ func (controller *electionController) AddParticipants(cxt *gin.Context) (int, er
 
 	var participants []dto.CreateParticipantDTO
 	for _, participant := range rows {
-		participants = append(participants, dto.CreateParticipantDTO{RegisterNumber: strings.ReplaceAll(participant[0], ".0", "")})
+		if len(participant) != 0 {
+			participants = append(participants, dto.CreateParticipantDTO{RegisterNumber: strings.ReplaceAll(participant[0], ".0", "")})
+		}
 	}
 
 	return controller.electionService.AddParticipants(userId, electionId, participants)

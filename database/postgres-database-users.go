@@ -5,13 +5,23 @@ import (
 	"elect/models"
 	"errors"
 	"strconv"
+	"strings"
 
 	"github.com/biezhi/gorm-paginator/pagination"
 	uuid "github.com/satori/go.uuid"
 )
 
 func (db *postgresDatabase) RegisterStudent(user models.User) error {
-	res := db.connection.Create(&user)
+	var count int
+	res := db.connection.Model(&models.User{}).Where("UPPER(email) = ? OR reg_number = ?", strings.ToUpper(user.Email), user.RegNumber).Count(&count)
+	if res.Error != nil {
+		return res.Error
+	}
+	if count > 0 {
+		return errors.New("User already registered!")
+	}
+
+	res = db.connection.Create(&user)
 	if res.Error != nil {
 		return res.Error
 	}

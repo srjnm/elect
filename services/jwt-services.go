@@ -14,7 +14,9 @@ import (
 
 type JWTService interface {
 	GenerateToken(dto.AuthUserDTO, int) string
+	GenerateTokenForSuperAdmin(authUserDTO dto.AuthUserDTO, role int) string
 	GenerateRefreshToken(dto.AuthUserDTO) string
+	GenerateRefreshTokenForSuperAdmin(authUserDTO dto.AuthUserDTO) string
 	GenerateNewTokens(tokenString string) (string, string, error)
 	ValidateAccessToken(tokenString string) (*jwt.Token, error)
 	ValidateRefreshToken(tokenString string) (*jwt.Token, error)
@@ -44,6 +46,25 @@ func (service *jwtService) GenerateToken(authUserDTO dto.AuthUserDTO, role int) 
 		"email":  authUserDTO.Email,
 		"role":   role,
 		"exp":    time.Now().Add(time.Minute * 1).Unix(),
+		"iss":    service.issuer,
+		"iat":    time.Now().Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	t, err := token.SignedString([]byte(os.Getenv("ACCESS_TOKEN_SECRET")))
+	if err != nil {
+		panic(err)
+	}
+	return t
+}
+
+func (service *jwtService) GenerateTokenForSuperAdmin(authUserDTO dto.AuthUserDTO, role int) string {
+	claims := &jwt.MapClaims{
+		"userid": authUserDTO.UserID,
+		"email":  authUserDTO.Email,
+		"role":   role,
+		"exp":    time.Now().Add(time.Hour * 24).Unix(),
 		"iss":    service.issuer,
 		"iat":    time.Now().Unix(),
 	}
@@ -89,6 +110,25 @@ func (service *jwtService) GenerateRefreshToken(authUserDTO dto.AuthUserDTO) str
 		"userid": authUserDTO.UserID,
 		"email":  authUserDTO.Email,
 		"exp":    time.Now().Add(time.Hour * 24 * 7).Unix(),
+		"iss":    service.issuer,
+		"iat":    time.Now().Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	t, err := token.SignedString([]byte(os.Getenv("REFRESH_TOKEN_SECRET") + authUserDTO.Password))
+	if err != nil {
+		panic(err)
+	}
+
+	return t
+}
+
+func (service *jwtService) GenerateRefreshTokenForSuperAdmin(authUserDTO dto.AuthUserDTO) string {
+	claims := &jwt.MapClaims{
+		"userid": authUserDTO.UserID,
+		"email":  authUserDTO.Email,
+		"exp":    time.Now().Add(time.Hour * 24).Unix(),
 		"iss":    service.issuer,
 		"iat":    time.Now().Unix(),
 	}

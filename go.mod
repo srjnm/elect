@@ -11,6 +11,7 @@ require (
 	github.com/biezhi/gorm-paginator/pagination v0.0.0-20190124091837-7a5c8ed20334
 	github.com/casbin/casbin/v2 v2.31.4
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/gin-contrib/static v0.0.1
 	github.com/gin-gonic/gin v1.7.2
 	github.com/go-playground/validator/v10 v10.6.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
@@ -25,7 +26,6 @@ require (
 	github.com/qor/admin v0.0.0-20210618093657-422fa7d6a546
 	github.com/qor/qor v0.0.0-20210513025647-811b8dd7cfcf
 	github.com/qor/validations v0.0.0-20171228122639-f364bca61b46
-	github.com/rs/cors v1.7.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/swaggo/files v0.0.0-20190704085106-630677cd5c14
 	github.com/swaggo/gin-swagger v1.3.0

@@ -848,39 +848,6 @@ var doc = `{
                 }
             }
         },
-        "/logout": {
-            "post": {
-                "description": "A user has to be logged in currently to access this endpoint.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "User Logout",
-                "operationId": "logout",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/dto.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/otp": {
             "post": {
                 "produces": [
@@ -1084,6 +1051,39 @@ var doc = `{
                 }
             }
         },
+        "/ulogout": {
+            "post": {
+                "description": "A user has to be logged in currently to access this endpoint.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "User Logout",
+                "operationId": "logout",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/verifytoken/{token}": {
             "post": {
                 "produces": [
@@ -1264,6 +1264,9 @@ var doc = `{
         "dto.Elections": {
             "type": "object",
             "properties": {
+                "blacklisted": {
+                    "type": "boolean"
+                },
                 "election_id": {
                     "type": "string"
                 },
@@ -1328,6 +1331,9 @@ var doc = `{
         "dto.GeneralElectionDTO": {
             "type": "object",
             "properties": {
+                "blacklisted": {
+                    "type": "boolean"
+                },
                 "candidate": {
                     "$ref": "#/definitions/dto.GeneralCandidateDTO"
                 },
@@ -1576,7 +1582,7 @@ type swaggerInfo struct {
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.0",
-	Host:        "localhost:8080",
+	Host:        "e1ect.herokuapp.com",
 	BasePath:    "/",
 	Schemes:     []string{},
 	Title:       "ELECT REST API",

@@ -12,14 +12,13 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	"github.com/qor/admin"
 )
 
 type postgresDatabase struct {
 	connection *gorm.DB
 }
 
-func NewPostgresDatabase() (Database, *http.ServeMux, *admin.Admin) {
+func NewPostgresDatabase() (Database, *http.ServeMux) {
 	source := os.Getenv("DATABASE_URL")
 	db, err := gorm.Open("postgres", source)
 	if err != nil {
@@ -51,9 +50,9 @@ func NewPostgresDatabase() (Database, *http.ServeMux, *admin.Admin) {
 		}
 	}
 
-	mux, admin := SetUpQORAdmin(db)
+	mux := SetUpQORAdmin(db)
 
 	return &postgresDatabase{
 		connection: db,
-	}, mux, admin
+	}, mux
 }

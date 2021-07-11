@@ -197,12 +197,15 @@ func (db *postgresDatabase) GetElectionsForStudents(userId string, paginatorPara
 		return nil, nil, res.Error
 	}
 
+	log.Println("Elections:")
+	log.Println(electionIds)
+
 	var elections []models.Election
 	var voted []bool
 	if paginatorParams.Page == "" {
 		for _, eId := range electionIds {
 			var election models.Election
-			res := db.connection.Model(&models.Election{}).Where("election_id = ?", eId.ElectionID.String()).First(&election)
+			res := db.connection.Model(&models.Election{}).Where("election_id = ?", eId.ElectionID.String()).Find(&election)
 			if res.Error != nil {
 				log.Println(res.Error.Error())
 				return nil, nil, res.Error
@@ -530,30 +533,30 @@ func (db *postgresDatabase) GetElectionForAdmins(userId string, electionId strin
 	return election, generalParticipantDTOs, candidates, nil
 }
 
-func (db *postgresDatabase) GetElectionForStudents(userId string, electionId string) (models.Election, []models.Candidate, models.Candidate, bool, error) {
+func (db *postgresDatabase) GetElectionForStudents(userId string, electionId string) (models.Election, []models.Candidate, models.Candidate, bool, bool, error) {
 	var count int
 	res := db.connection.Model(&models.Participant{}).Where("election_id = ? AND user_id = ?", electionId, userId).Count(&count)
 	if res.Error != nil {
 		log.Println(res.Error.Error())
-		return models.Election{}, nil, models.Candidate{}, false, res.Error
+		return models.Election{}, nil, models.Candidate{}, false, false, res.Error
 	}
 	if count == 0 {
 		log.Println("Unauthorized!")
-		return models.Election{}, nil, models.Candidate{}, false, errors.New("Unauthorized!")
+		return models.Election{}, nil, models.Candidate{}, false, false, errors.New("Unauthorized!")
 	}
 
 	var election models.Election
 	res = db.connection.Model(&models.Election{}).Where("election_id = ?", electionId).Find(&election)
 	if res.Error != nil {
 		log.Println(res.Error.Error())
-		return models.Election{}, nil, models.Candidate{}, false, res.Error
+		return models.Election{}, nil, models.Candidate{}, false, false, res.Error
 	}
 
 	var candidates []models.Candidate
 	res = db.connection.Model(&models.Candidate{}).Where("election_id = ? AND approved = ?", electionId, true).Find(&candidates)
 	if res.Error != nil {
 		log.Println(res.Error.Error())
-		return models.Election{}, nil, models.Candidate{}, false, res.Error
+		return models.Election{}, nil, models.Candidate{}, false, false, res.Error
 	}
 
 	var candidate models.Candidate
@@ -561,13 +564,13 @@ func (db *postgresDatabase) GetElectionForStudents(userId string, electionId str
 	res = db.connection.Model(&models.Candidate{}).Where("election_id = ? AND user_id = ?", electionId, userId).Count(&ccount)
 	if res.Error != nil && !errors.Is(res.Error, gorm.ErrRecordNotFound) {
 		log.Println(res.Error.Error())
-		return models.Election{}, nil, models.Candidate{}, false, res.Error
+		return models.Election{}, nil, models.Candidate{}, false, false, res.Error
 	} else {
 		if ccount > 0 {
 			res = db.connection.Model(&models.Candidate{}).Where("election_id = ? AND user_id = ?", electionId, userId).Find(&candidate)
 			if res.Error != nil {
 				log.Println(res.Error.Error())
-				return models.Election{}, nil, models.Candidate{}, false, res.Error
+				return models.Election{}, nil, models.Candidate{}, false, false, res.Error
 			}
 		}
 	}
@@ -576,10 +579,21 @@ func (db *postgresDatabase) GetElectionForStudents(userId string, electionId str
 	res = db.connection.Model(&models.Participant{}).Where("election_id = ? AND user_id = ?", electionId, userId).Find(&participant)
 	if res.Error != nil {
 		log.Println(res.Error.Error())
-		return models.Election{}, nil, models.Candidate{}, false, res.Error
+		return models.Election{}, nil, models.Candidate{}, false, false, res.Error
 	}
 
-	return election, candidates, candidate, participant.Voted, nil
+	var bcount int
+	res = db.connection.Model(&models.Blacklist{}).Where("user_id = ?", userId).Count(&bcount)
+	if res.Error != nil {
+		log.Println(res.Error.Error())
+		return models.Election{}, nil, models.Candidate{}, false, false, res.Error
+	}
+
+	if bcount > 0 {
+		return election, candidates, candidate, participant.Voted, true, nil
+	}
+
+	return election, candidates, candidate, participant.Voted, false, nil
 }
 
 func (db *postgresDatabase) CastVote(userId string, electionId string, candidateId string) error {

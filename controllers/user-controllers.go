@@ -5,6 +5,7 @@ import (
 	"elect/email"
 	"elect/services"
 	"errors"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -85,11 +86,7 @@ func (controller *userController) Login(cxt *gin.Context) (string, error) {
 				Name:     "otp",
 				Value:    encoded,
 				MaxAge:   240,
-				Path:     "/",
-				Domain:   "",
-				Secure:   true,
 				HttpOnly: true,
-				SameSite: http.SameSiteNoneMode,
 			},
 		)
 	}
@@ -130,11 +127,7 @@ func (controller *userController) Refresh(cxt *gin.Context) error {
 				Name:     "token",
 				Value:    "",
 				MaxAge:   -1,
-				Path:     "/",
-				Domain:   "",
-				Secure:   true,
 				HttpOnly: true,
-				SameSite: http.SameSiteNoneMode,
 			},
 		)
 
@@ -152,11 +145,7 @@ func (controller *userController) Refresh(cxt *gin.Context) error {
 				Name:     "token",
 				Value:    "",
 				MaxAge:   -1,
-				Path:     "/",
-				Domain:   "",
-				Secure:   true,
 				HttpOnly: true,
-				SameSite: http.SameSiteNoneMode,
 			},
 		)
 		cxt.AbortWithStatusJSON(http.StatusNetworkAuthenticationRequired, dto.Response{
@@ -185,11 +174,7 @@ func (controller *userController) Refresh(cxt *gin.Context) error {
 				Name:     "token",
 				Value:    encoded,
 				MaxAge:   3600 * 24 * 7,
-				Path:     "/",
-				Domain:   "",
-				Secure:   true,
 				HttpOnly: true,
-				SameSite: http.SameSiteNoneMode,
 			},
 		)
 	}
@@ -254,25 +239,44 @@ func (controller *userController) OTPVerication(cxt *gin.Context) (string, strin
 
 	var s = securecookie.New([]byte(os.Getenv("COOKIE_HASH_SECRET")), nil)
 
-	value := map[string]string{
-		"access_token":  controller.jwtService.GenerateToken(dbUser, role),
-		"refresh_token": controller.jwtService.GenerateRefreshToken(dbUser),
+	var value map[string]string
+
+	if role == 2 {
+		value = map[string]string{
+			"access_token":  controller.jwtService.GenerateTokenForSuperAdmin(dbUser, role),
+			"refresh_token": controller.jwtService.GenerateRefreshTokenForSuperAdmin(dbUser),
+		}
+	} else {
+		value = map[string]string{
+			"access_token":  controller.jwtService.GenerateToken(dbUser, role),
+			"refresh_token": controller.jwtService.GenerateRefreshToken(dbUser),
+		}
 	}
 
-	if encoded, err := s.Encode("tokens", value); err == nil {
-		http.SetCookie(
-			cxt.Writer,
-			&http.Cookie{
-				Name:     "token",
-				Value:    encoded,
-				MaxAge:   3600 * 24 * 7,
-				Path:     "/",
-				Domain:   "",
-				Secure:   true,
-				HttpOnly: true,
-				SameSite: http.SameSiteNoneMode,
-			},
-		)
+	if role == 2 {
+		if encoded, err := s.Encode("tokens", value); err == nil {
+			http.SetCookie(
+				cxt.Writer,
+				&http.Cookie{
+					Name:     "token",
+					Value:    encoded,
+					MaxAge:   3600 * 24,
+					HttpOnly: true,
+				},
+			)
+		}
+	} else {
+		if encoded, err := s.Encode("tokens", value); err == nil {
+			http.SetCookie(
+				cxt.Writer,
+				&http.Cookie{
+					Name:     "token",
+					Value:    encoded,
+					MaxAge:   3600 * 24 * 7,
+					HttpOnly: true,
+				},
+			)
+		}
 	}
 
 	err = controller.userService.SetActiveRefreshToken(value["refresh_token"], dbUser.Email)
@@ -374,16 +378,19 @@ func (controller *userController) RegisterStudents(cxt *gin.Context) (int, error
 
 	for index, row := range rows {
 		if index != 0 {
-			if err == nil {
-				err = controller.userService.RegisterStudent(dto.RegisterStudentDTO{
-					RegNumber:    strings.ReplaceAll(row[0], ".0", ""),
-					FirstName:    row[1],
-					LastName:     row[2],
-					Email:        row[3],
-					RegisteredBy: registeredBy,
-				})
-				if err == nil {
-					successCount++
+			if err == nil && len(row) != 0 {
+				if strings.TrimSpace(row[0]) != "" && strings.TrimSpace(row[1]) != "" && strings.TrimSpace(row[2]) != "" {
+					log.Println(row)
+					err = controller.userService.RegisterStudent(dto.RegisterStudentDTO{
+						RegNumber:    strings.ReplaceAll(row[0], ".0", ""),
+						FirstName:    row[1],
+						LastName:     row[2],
+						Email:        row[3],
+						RegisteredBy: registeredBy,
+					})
+					if err == nil {
+						successCount++
+					}
 				}
 			}
 		}
@@ -501,11 +508,7 @@ func (controller *userController) ChangePassword(cxt *gin.Context) error {
 				Name:     "token",
 				Value:    encoded,
 				MaxAge:   3600 * 24 * 7,
-				Path:     "/",
-				Domain:   "",
-				Secure:   true,
 				HttpOnly: true,
-				SameSite: http.SameSiteNoneMode,
 			},
 		)
 	}

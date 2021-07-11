@@ -358,12 +358,7 @@ func (election *ElectionAPI) ElectionUpdatesHandler(cxt *gin.Context) {
 var connections = make(map[*websocket.Conn]bool)
 
 func electionWS(w http.ResponseWriter, r *http.Request) {
-	var wsUpgrader = websocket.Upgrader{
-		CheckOrigin: func(r *http.Request) bool {
-			origin := r.Header.Get("Origin")
-			return contains([]string{"http://localhost:8000", "http://localhost:3000", "http://localhost:8080", "https://e1ect.herokuapp.com/", "http://192.168.1.248:3000"}, origin)
-		},
-	}
+	var wsUpgrader = websocket.Upgrader{}
 	conn, err := wsUpgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println("Failed to upgrade the connection: " + err.Error())

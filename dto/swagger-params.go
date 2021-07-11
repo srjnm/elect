@@ -23,6 +23,7 @@ type Elections struct {
 	LockingAt      string `json:"locking_at"`
 	GenderSpecific bool   `json:"gender_specific,omitempty"`
 	Voted          bool   `json:"voted,omitempty"`
+	Blacklisted    bool   `json:"blacklisted,omitempty"`
 }
 
 type CandidateInputs struct {

@@ -5,6 +5,7 @@ import (
 	"elect/mappers"
 	"elect/models"
 	"errors"
+	"strings"
 	"time"
 
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -15,11 +16,11 @@ import (
 func (db *postgresDatabase) FindUserForAuth(email string) (dto.AuthUserDTO, error) {
 	var count int
 	user := models.User{}
-	if db.connection.Model(&user).Where("email = ?", email).Count(&count); count == 0 {
+	if db.connection.Model(&user).Where("UPPER(email) = ?", strings.ToUpper(email)).Count(&count); count == 0 {
 		return dto.AuthUserDTO{}, errors.New("Invalid user!")
 	}
 
-	if db.connection.Where("email = ?", email).Find(&user).RowsAffected == 0 {
+	if db.connection.Where("UPPER(email) = ?", strings.ToUpper(email)).Find(&user).RowsAffected == 0 {
 		return dto.AuthUserDTO{}, errors.New("Invalid user!")
 	}
 

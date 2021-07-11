@@ -55,7 +55,7 @@ func (auth *AuthAPI) LoginHandler(cxt *gin.Context) {
 // @Success 200 {object} dto.Response
 // @Failure 401 {object} dto.Response
 // @Failure 400 {object} dto.Response
-// @Router /logout [post]
+// @Router /ulogout [post]
 func (auth *AuthAPI) LogoutHandler(cxt *gin.Context) {
 	err := auth.userController.Logout(cxt)
 
@@ -72,11 +72,7 @@ func (auth *AuthAPI) LogoutHandler(cxt *gin.Context) {
 			Name:     "token",
 			Value:    "",
 			MaxAge:   -1,
-			Path:     "/",
-			Domain:   "",
-			Secure:   true,
 			HttpOnly: true,
-			SameSite: http.SameSiteNoneMode,
 		},
 	)
 
@@ -84,6 +80,10 @@ func (auth *AuthAPI) LogoutHandler(cxt *gin.Context) {
 		Message: "Logged out successfully",
 	})
 	return
+}
+
+func (auth *AuthAPI) LogoutGETHandler(cxt *gin.Context) {
+	cxt.HTML(http.StatusOK, "logout.html", nil)
 }
 
 // Refresh godoc
@@ -198,11 +198,7 @@ func (auth *AuthAPI) OTPHandler(cxt *gin.Context) {
 				Name:     "otp",
 				Value:    "",
 				MaxAge:   -1,
-				Path:     "/",
-				Domain:   "",
-				Secure:   true,
 				HttpOnly: true,
-				SameSite: http.SameSiteNoneMode,
 			},
 		)
 		cxt.JSON(http.StatusOK, dto.OTPResponse{

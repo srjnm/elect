@@ -57,15 +57,16 @@ type Database interface {
 	ApproveCandidate(userId string, candidateId string) error
 	UnapproveCandidate(userId string, candidateId string) error
 	GetElectionForAdmins(userId string, electionId string) (models.Election, []dto.GeneralParticipantDTO, []models.Candidate, error)
-	GetElectionForStudents(userId string, electionId string) (models.Election, []models.Candidate, models.Candidate, bool, error)
+	GetElectionForStudents(userId string, electionId string) (models.Election, []models.Candidate, models.Candidate, bool, bool, error)
 	CastVote(userId string, electionId string, candidateId string) error
 	GetResults(userId string, role int, electionId string) (models.Election, []models.Candidate, []models.Candidate, []models.Candidate, []models.Candidate, int, error)
 }
 
-func SetUpQORAdmin(db *gorm.DB) (*http.ServeMux, *admin.Admin) {
+func SetUpQORAdmin(db *gorm.DB) *http.ServeMux {
+
 	adm := admin.New(&admin.AdminConfig{SiteName: "ELECT", DB: db})
 	mux := http.NewServeMux()
-	adm.MountTo("/admin", mux)
+	adm.MountTo("/superadmin", mux)
 
 	// User Management
 	usr := adm.AddResource(models.User{}, &admin.Config{Menu: []string{"User Management"}})
@@ -194,6 +195,7 @@ func SetUpQORAdmin(db *gorm.DB) (*http.ServeMux, *admin.Admin) {
 	part := adm.AddResource(models.Participant{}, &admin.Config{Menu: []string{"Election Management"}, IconName: "Election"})
 	part.IndexAttrs("-User", "-Election")
 	part.NewAttrs("-User", "-Election", "-Voted")
+	part.EditAttrs("-User", "-Election")
 	part.Meta(&admin.Meta{
 		Name: "UserID",
 		Type: "string",
@@ -254,5 +256,5 @@ func SetUpQORAdmin(db *gorm.DB) (*http.ServeMux, *admin.Admin) {
 
 	validations.RegisterCallbacks(db)
 
-	return mux, adm
+	return mux
 }

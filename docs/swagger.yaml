@@ -91,6 +91,8 @@ definitions:
     type: object
   dto.Elections:
     properties:
+      blacklisted:
+        type: boolean
       election_id:
         type: string
       ending_at:
@@ -133,6 +135,8 @@ definitions:
     type: object
   dto.GeneralElectionDTO:
     properties:
+      blacklisted:
+        type: boolean
       candidate:
         $ref: '#/definitions/dto.GeneralCandidateDTO'
       candidates:
@@ -286,7 +290,7 @@ definitions:
     - password
     - token
     type: object
-host: localhost:8080
+host: e1ect.herokuapp.com
 info:
   contact:
     email: surajnm15@gmail.com
@@ -835,28 +839,6 @@ paths:
       summary: User Login
       tags:
       - auth
-  /logout:
-    post:
-      description: A user has to be logged in currently to access this endpoint.
-      operationId: logout
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/dto.Response'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/dto.Response'
-      summary: User Logout
-      tags:
-      - auth
   /otp:
     post:
       operationId: submitOTP
@@ -988,6 +970,28 @@ paths:
           schema:
             $ref: '#/definitions/dto.Response'
       summary: Verify Email and Set Password
+      tags:
+      - auth
+  /ulogout:
+    post:
+      description: A user has to be logged in currently to access this endpoint.
+      operationId: logout
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: User Logout
       tags:
       - auth
   /verifytoken/{token}:
