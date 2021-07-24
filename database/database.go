@@ -196,7 +196,7 @@ func SetUpQORAdmin(db *gorm.DB) *http.ServeMux {
 	part := adm.AddResource(models.Participant{}, &admin.Config{Menu: []string{"Election Management"}, IconName: "Election"})
 	part.IndexAttrs("-User", "-Election")
 	part.NewAttrs("-User", "-Election", "-Voted")
-	part.EditAttrs("-User", "-Election")
+	part.EditAttrs("-User", "-Election", "-Voted")
 	part.Meta(&admin.Meta{
 		Name: "UserID",
 		Type: "string",
