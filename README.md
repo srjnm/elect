@@ -35,7 +35,7 @@ Elect is a web application for conducting college elections(specifically designe
     - IT Administrators
 
 # Features
-* 2-Factor Authentication is implemented. OTP is be sent to the user's email during login for verification.
+* 2-Factor Authentication is implemented. OTP is sent to the user's email during login for verification.
 * Votes are completely anonymous. There will be no connection between the voter and the candidate after voting, not even in the database.
 * Users are restricted to a single concurrent session(i.e, a user cannot be logged in from 2 devices at the same time).
 * It has a modular approach, elections among students can be conducted for any purpose.

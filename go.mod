@@ -6,6 +6,7 @@ go 1.15
 require (
 	github.com/Azure/azure-storage-blob-go v0.14.0
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
+	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/aws/aws-sdk-go v1.40.23 // indirect
 	github.com/biezhi/gorm-paginator/pagination v0.0.0-20190124091837-7a5c8ed20334
 	github.com/casbin/casbin/v2 v2.36.1
@@ -30,7 +31,7 @@ require (
 	github.com/lib/pq v1.10.2 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-isatty v0.0.13 // indirect
-	github.com/microcosm-cc/bluemonday v1.0.15 // indirect
+	github.com/microcosm-cc/bluemonday v1.0.17 // indirect
 	github.com/qor/admin v1.2.0
 	github.com/qor/qor v1.2.0
 	github.com/qor/responder v0.0.0-20201015104727-4f3a345378c2 // indirect
